@@ -1,0 +1,18 @@
+g=squirrellab.stimuli.GaussianNoiseGeneratorV2();
+g.preTime = 100;
+g.stimTime = 500;
+g.tailTime = 100;
+g.stDev = 2;
+g.freqCutoff = 500;
+g.numFilters = 4;
+g.mean = -60;
+g.seed = 0;
+g.sampleRate = 1000;
+g.upperLimit = -55;
+g.lowerLimit = -65;
+g.units = 'mV';
+s=g.generate();
+
+f1=getfigH(1);
+lH=lineH([],s.getData,f1);
+lH.linemarkers;'

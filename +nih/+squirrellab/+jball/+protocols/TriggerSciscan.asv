@@ -1,0 +1,104 @@
+classdef TriggerSciscan  < symphonyui.core.Protocol
+    % Test protocol to send trigger to sciscan over the digital output
+    
+    properties
+        trigger                         % Trigger to use to tell SciScan to start scanning
+        amp                             % Input amplifier
+        waitTime = 250                  % Time until trigger is sent (ms)
+        triggerDuration = 5             % Time for the trigger to latch high (ms) (shorter the better as long as it works)
+        totalTime = 1000                % Protocol duration (ms)
+        numberOfAverages = uint16(1)    % Number of epochs
+        interpulseInterval = 0          % Duration between pulses (s)
+    end
+    
+    properties (Hidden)
+        triggerType  %Not sure I need this?
+        ampType
+    end
+    
+    methods
+        
+        function didSetRig(obj)
+            didSetRig@symphonyui.core.Protocol(obj);
+            
+            [obj.trigger, obj.triggerType] = obj.createDeviceNamesProperty('trigger'); %Lowercase because that's what I used when naming the sciscan trigger in the rig description
+            [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
+        end
+        
+        function p = getPreview(obj, panel)
+            p = symphonyui.builtin.previews.StimuliPreview(panel, @()obj.createTriggerStimulus());
+        end
+        
+        function prepareRun(obj)
+            prepareRun@symphonyui.core.Protocol(obj);
+            
+            obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('symphonyui.builtin.figures.MeanResponseFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('symphonyui.builtin.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, ...
+                'baselineRegion', [0 obj.waitTime], ...
+                'measurementRegion', [obj.waitTime obj.totalTime]);
+            
+        end
+        
+%         function stim = createLedStimulus(obj)
+%             gen = symphonyui.builtin.stimuli.PulseGenerator();
+%             
+%             gen.preTime = obj.preTime;
+%             gen.stimTime = obj.stimTime;
+%             gen.tailTime = obj.tailTime;
+%             gen.amplitude = obj.lightAmplitude;
+%             gen.mean = obj.lightMean;
+%             gen.sampleRate = obj.sampleRate;
+%             gen.units = 'V';
+%             
+%             stim = gen.generate();
+%         end
+        
+        function stim = createTriggerStimulus(obj)
+            gen = symphonyui.builtin.stimuli.PulseGenerator();
+            
+            %Not sure how the pulsegenerator object will use these time
+            %values. Will have to check it out & make sure these numbers
+            %make sense.
+            gen.preTime = 0;
+            gen.stimTime = obj.waitTime;
+            gen.tailTime = obj.totalTime - (obj.waitTime + obj.triggerDuration);
+            
+            gen.amplitude = 1;
+            gen.mean = 0;
+            gen.sampleRate = obj.sampleRate;
+            gen.units = symphonyui.core.Measurement.UNITLESS;
+            
+            stim = gen.generate();
+        end
+
+        
+        
+        function prepareEpoch(obj, epoch)
+            prepareEpoch@symphonyui.core.Protocol(obj, epoch);
+            
+            epoch.addStimulus(obj.rig.getDevice(obj.trigger), obj.createTriggerStimulus());
+            epoch.addResponse(obj.rig.getDevice(obj.amp));  %Again, how does addResponse know what stream to use on the amplifier as the response?
+        end
+        
+        
+        
+        function prepareInterval(obj, interval)
+            prepareInterval@symphonyui.core.Protocol(obj, interval);
+            
+            device = obj.rig.getDevice(obj.led);
+            interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);
+        end
+        
+        function tf = shouldContinuePreparingEpochs(obj)
+            tf = obj.numEpochsPrepared < obj.numberOfAverages;
+        end
+        
+        function tf = shouldContinueRun(obj)
+            tf = obj.numEpochsCompleted < obj.numberOfAverages;
+        end
+        
+    end
+    
+end
+
