@@ -1,45 +1,32 @@
-classdef LedPulse < edu.washington.riekelab.protocols.RiekeLabProtocol
-    % Presents a set of rectangular pulse stimuli to a specified LED and records from a specified amplifier.
+classdef ledPulse < squirrellab.protocols.SquirrelLabProtocol
     
     properties
         led                             % Output LED
         preTime = 10                    % Pulse leading duration (ms)
         stimTime = 100                  % Pulse duration (ms)
         tailTime = 400                  % Pulse trailing duration (ms)
-        lightAmplitude = 0.1            % Pulse amplitude (V or norm. [0-1] depending on LED units)
-        lightMean = 0                   % Pulse and LED background mean (V or norm. [0-1] depending on LED units)
+        lightAmplitude = 5              % Pulse amplitude (V)
+        lightMean = 0                   % Pulse and LED background mean (V)
         amp                             % Input amplifier
-    end
-    
-    properties (Dependent, SetAccess = private)
-        amp2                            % Secondary amplifier
-    end
-    
-    properties
-        numberOfAverages = uint16(5)    % Number of epochs
+%         frame                           % Frame monitor
+        numberOfAverages = uint16(1)    % Number of epochs
         interpulseInterval = 0          % Duration between pulses (s)
     end
     
     properties (Hidden)
         ledType
         ampType
+        frameType
     end
     
     methods
         
         function didSetRig(obj)
-            didSetRig@edu.washington.riekelab.protocols.RiekeLabProtocol(obj);
+            didSetRig@squirrellab.protocols.SquirrelLabProtocol(obj);
             
             [obj.led, obj.ledType] = obj.createDeviceNamesProperty('LED');
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
-        end
-        
-        function d = getPropertyDescriptor(obj, name)
-            d = getPropertyDescriptor@edu.washington.riekelab.protocols.RiekeLabProtocol(obj, name);
-            
-            if strncmp(name, 'amp2', 4) && numel(obj.rig.getDeviceNames('Amp')) < 2
-                d.isHidden = true;
-            end
+%             [obj.frame, obj.frameType] = obj.createDeviceNamesProperty('FrameMonitor');
         end
         
         function p = getPreview(obj, panel)
@@ -47,26 +34,15 @@ classdef LedPulse < edu.washington.riekelab.protocols.RiekeLabProtocol
         end
         
         function prepareRun(obj)
-            prepareRun@edu.washington.riekelab.protocols.RiekeLabProtocol(obj);
+            prepareRun@squirrellab.protocols.SquirrelLabProtocol(obj);
             
-            if numel(obj.rig.getDeviceNames('Amp')) < 2
-                obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.amp));
-                obj.showFigure('symphonyui.builtin.figures.MeanResponseFigure', obj.rig.getDevice(obj.amp));
-                obj.showFigure('symphonyui.builtin.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, ...
-                    'baselineRegion', [0 obj.preTime], ...
-                    'measurementRegion', [obj.preTime obj.preTime+obj.stimTime]);
-            else
-                obj.showFigure('edu.washington.riekelab.figures.DualResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2));
-                obj.showFigure('edu.washington.riekelab.figures.DualMeanResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2));
-                obj.showFigure('edu.washington.riekelab.figures.DualResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, obj.rig.getDevice(obj.amp2), {@mean, @var}, ...
-                    'baselineRegion1', [0 obj.preTime], ...
-                    'measurementRegion1', [obj.preTime obj.preTime+obj.stimTime], ...
-                    'baselineRegion2', [0 obj.preTime], ...
-                    'measurementRegion2', [obj.preTime obj.preTime+obj.stimTime]);
-            end
+            obj.showFigure('squirrellab.figures.DataFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('squirrellab.figures.AverageFigure', obj.rig.getDevice(obj.amp),'prepts',obj.timeToPts(obj.preTime));
+            obj.showFigure('squirrellab.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, ...
+                'baselineRegion', [0 obj.preTime], ...
+                'measurementRegion', [obj.preTime obj.preTime+obj.stimTime]);
             
-            device = obj.rig.getDevice(obj.led);
-            device.background = symphonyui.core.Measurement(obj.lightMean, device.background.displayUnits);
+            obj.rig.getDevice(obj.led).background = symphonyui.core.Measurement(obj.lightMean, 'V');
         end
         
         function stim = createLedStimulus(obj)
@@ -78,24 +54,20 @@ classdef LedPulse < edu.washington.riekelab.protocols.RiekeLabProtocol
             gen.amplitude = obj.lightAmplitude;
             gen.mean = obj.lightMean;
             gen.sampleRate = obj.sampleRate;
-            gen.units = obj.rig.getDevice(obj.led).background.displayUnits;
+            gen.units = 'V';
             
             stim = gen.generate();
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@edu.washington.riekelab.protocols.RiekeLabProtocol(obj, epoch);
+            prepareEpoch@squirrellab.protocols.SquirrelLabProtocol(obj, epoch);
             
             epoch.addStimulus(obj.rig.getDevice(obj.led), obj.createLedStimulus());
             epoch.addResponse(obj.rig.getDevice(obj.amp));
-            
-            if numel(obj.rig.getDeviceNames('Amp')) >= 2
-                epoch.addResponse(obj.rig.getDevice(obj.amp2));
-            end
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@edu.washington.riekelab.protocols.RiekeLabProtocol(obj, interval);
+            prepareInterval@squirrellab.protocols.SquirrelLabProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.led);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);
@@ -107,16 +79,6 @@ classdef LedPulse < edu.washington.riekelab.protocols.RiekeLabProtocol
         
         function tf = shouldContinueRun(obj)
             tf = obj.numEpochsCompleted < obj.numberOfAverages;
-        end
-        
-        function a = get.amp2(obj)
-            amps = obj.rig.getDeviceNames('Amp');
-            if numel(amps) < 2
-                a = '(None)';
-            else
-                i = find(~ismember(amps, obj.amp), 1);
-                a = amps{i};
-            end
         end
         
     end

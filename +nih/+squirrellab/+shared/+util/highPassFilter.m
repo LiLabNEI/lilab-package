@@ -1,18 +1,27 @@
-function filtered = highPassFilter(data, freq, sampleInterval)
-    % data is a vector or matrix of row vectors. freq is in Hz. sampleInterval is in seconds.
-    
-    len = size(data, 2);
-    if len == 1 % flip if given a column vector
-        data = data';
-        len = size(data, 2);
-    end
-    
-    freqStepSize = 1/(sampleInterval * len);
-    freqKeepPts = round(freq / freqStepSize);
-
-    % Eliminate frequencies beyond cutoff (middle of matrix given fft representation).
-    fftData = fft(data, [], 2);
-    fftData(:,1:freqKeepPts) = 0;
-    fftData(end-freqKeepPts:end) = 0;
-    filtered = real(ifft(fftData, [], 2));
+function Xfilt = highPassFilter(X,F,SampleInterval)
+% %F is in Hz
+% %Sample interval is in seconds
+% %X is a vector or a matrix of row vectors
+L = size(X,2);
+if L == 1 %flip if given a column vector
+    X=X'; 
+    L = size(X,2);
 end
+
+FreqStepSize = 1/(SampleInterval * L);
+FreqKeepPts = round(F / FreqStepSize);
+
+% eliminate frequencies beyond cutoff (middle of matrix given fft
+% representation)
+
+FFTData = fft(X, [], 2);
+FFTData(:,1:FreqKeepPts) = 0;
+FFTData(end-FreqKeepPts:end) = 0;
+Xfilt = real(ifft(FFTData, [], 2));
+
+% Wn = F*SampleInterval; %normalized frequency cutoff
+% [z, p, k] = butter(1,Wn,'high');
+% [sos,g]=zp2sos(z,p,k);
+% myfilt=dfilt.df2sos(sos,g);
+% Xfilt = filter(myfilt,X');
+% Xfilt = Xfilt';
