@@ -5,6 +5,7 @@ classdef BackgroundControl < symphonyui.ui.Module
         settings
         toolbar
         turnLedsOffTool
+        zeroVcmd
         devices
         deviceListeners
         deviceGrid
@@ -14,7 +15,7 @@ classdef BackgroundControl < symphonyui.ui.Module
         
         function obj = BackgroundControl()
             obj.log = log4m.LogManager.getLogger(class(obj));
-            obj.settings = squirrellab.modules.settings.BackgroundControlSettings();
+            obj.settings = nih.squirrellab.shared.modules.settings.BackgroundControlSettings();
         end
         
         function createUi(obj, figureHandle)
