@@ -1,4 +1,4 @@
-classdef Mouse < squirrellab.sources.Subject
+classdef Mouse < nih.squirrellab.shared.sources.Subject
     
     methods
         

@@ -1,4 +1,4 @@
-classdef ModelCell < squirrellab.sources.Cell
+classdef ModelCell < nih.squirrellab.shared.sources.Cell
     
     methods
         

@@ -1,10 +1,10 @@
-classdef MkRetCell < squirrellab.sources.RetCell
+classdef MkRetCell < nih.squirrellab.shared.sources.RetCell
     
     methods
         
         function obj = MkRetCell()
             import symphonyui.core.*;
-            obj.addAllowableParentType('squirrellab.sources.monkey.MkRetPrep');
+            obj.addAllowableParentType('nih.squirrellab.shared.sources.monkey.MkRetPrep');
         end
         
     end

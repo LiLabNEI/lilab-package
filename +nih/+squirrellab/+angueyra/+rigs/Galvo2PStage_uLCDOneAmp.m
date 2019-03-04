@@ -1,12 +1,12 @@
-classdef iTwoPhotonStage_uLCDNonAmp < squirrellab.rigs.iTwoPhotonStage_NonAmp   
- 
-   methods
+classdef iGalvo2PStage_uLCDOneAmp < squirrellab.rigs.iGalvo2PStage_OneAmp
+
+    methods
         
-        function obj = iTwoPhotonStage_uLCDOneAmp()
+        function obj = iGalvo2PStage_uLCDOneAmp()
             import symphonyui.builtin.devices.*;
             
             uLCD = squirrellab.devices.uLCDDevice('comPort','COM9');
-            uLCD.serial.connect();           
+%             uLCD.serial.connect();           
             fprintf('Initialized uLCD\n')
             % Binding the uLCD to an unused stream only so its configuration settings are written to each epoch.
             daq = obj.daqController;
@@ -15,12 +15,8 @@ classdef iTwoPhotonStage_uLCDNonAmp < squirrellab.rigs.iTwoPhotonStage_NonAmp
             fprintf('uLCD is bound to DAQ\n')
             obj.addDevice(uLCD);
             fprintf('uLCD has been added as device\n')
-            
-%             
-%             microdisplay.bindStream(daq.getStream('doport1'));
-%             daq.getStream('doport1').setBitPosition(microdisplay, 15);
-%             obj.addDevice(microdisplay);
         end
         
     end
 end
+    

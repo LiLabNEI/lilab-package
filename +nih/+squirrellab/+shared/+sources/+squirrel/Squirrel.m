@@ -1,4 +1,4 @@
-classdef Squirrel < squirrellab.sources.Subject
+classdef Squirrel < nih.squirrellab.shared.sources.Subject
     
     methods
         

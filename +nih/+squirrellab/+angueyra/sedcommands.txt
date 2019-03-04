@@ -1,0 +1,27 @@
+Loop through subdirs and do something
+for d in /Users/angueyraaristjm/matlab/lilab-package/+nih/+squirrellab/+shared/+epochgroups/*; do
+  if [ -d "$d" ]; then
+    echo "$d"
+  fi
+done
+
+
+
+sed -i 's/original/new/g' file.txt
+
+
+sed -i "" 's/squirrellab./nih.squirrellab.shared./g' *.txt
+
+
+
+find . -name '*.m' -print0 | xargs -0 sed -i "" 's/squirrellab./nih.squirrellab.shared./g'
+
+find . -name '*.m' -print0 | xargs -0 sed -i "" 's/edu.washington.riekelab./nih.squirrellab.shared./g'
+
+find . -name '*.m' -print0 | xargs -0 sed -i "" 's/RiekeLabProtocol/SquirrelLabProtocol/g'
+find . -name '*.m' -print0 | xargs -0 sed -i "" 's/RiekeLabStageProtocol/SquirrelLabStageProtocol/g'
+
+find . -name '*.m' -print0 | xargs -0 sed -i "" 's/%nih.squirrellab.shared.protocols.SquirrelLabAutoRCNoiseSineProtocol//g'
+
+
+find . -name '*.m' -print0 | xargs -0 sed -i "" 's/TwoPhoton/Galvo2P/g'

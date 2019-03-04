@@ -1,4 +1,4 @@
-classdef Monkey < squirrellab.sources.Subject
+classdef Monkey < nih.squirrellab.shared.sources.Subject
     
     methods
         
@@ -22,16 +22,16 @@ classdef Monkey < squirrellab.sources.Subject
 %              photoreceptors = containers.Map();
 %             photoreceptors('lCone') = struct( ...
 %                 'collectingArea', containers.Map({'photoreceptorSide', 'ganglionCellSide'}, {0.37, 0.60}), ...
-%                 'spectrum', importdata(squirrellab.Package.getCalibrationResource('sources', 'primate', 'l_cone_spectrum.txt')));
+%                 'spectrum', importdata(nih.squirrellab.shared.Package.getCalibrationResource('sources', 'primate', 'l_cone_spectrum.txt')));
 %             photoreceptors('mCone') = struct( ...
 %                 'collectingArea', containers.Map({'photoreceptorSide', 'ganglionCellSide'}, {0.37, 0.60}), ...
-%                 'spectrum', importdata(squirrellab.Package.getCalibrationResource('sources', 'primate', 'm_cone_spectrum.txt')));
+%                 'spectrum', importdata(nih.squirrellab.shared.Package.getCalibrationResource('sources', 'primate', 'm_cone_spectrum.txt')));
 %             photoreceptors('rod') = struct( ...
 %                 'collectingArea', containers.Map({'photoreceptorSide', 'ganglionCellSide'}, {1.00, 1.00}), ...
-%                 'spectrum', importdata(squirrellab.Package.getCalibrationResource('sources', 'primate', 'rod_spectrum.txt')));
+%                 'spectrum', importdata(nih.squirrellab.shared.Package.getCalibrationResource('sources', 'primate', 'rod_spectrum.txt')));
 %             photoreceptors('sCone') = struct( ...
 %                 'collectingArea', containers.Map({'photoreceptorSide', 'ganglionCellSide'}, {0.37, 0.60}), ...
-%                 'spectrum', importdata(squirrellab.Package.getCalibrationResource('sources', 'primate', 's_cone_spectrum.txt')));
+%                 'spectrum', importdata(nih.squirrellab.shared.Package.getCalibrationResource('sources', 'primate', 's_cone_spectrum.txt')));
 %             obj.addResource('photoreceptors', photoreceptors);
 %             
             

@@ -1,6 +1,6 @@
 classdef ledTwoSines < nih.squirrellab.shared.protocols.SquirrelLabProtocol
-    % First epoch: led1 only; Second epoch = led2 only; Third epoch: led1 +
-    % led2
+	% Presents a set of sinusoindal stimuli to a specified LED and records from a specified amplifier.
+	% First epoch: led1 only; Second epoch = led2 only; Third epoch: led1 + led2
     
     properties
         preTime = 200

@@ -1,4 +1,4 @@
-classdef Organoid < squirrellab.sources.Subject
+classdef Organoid < nih.squirrellab.shared.sources.Subject
     
     methods
         

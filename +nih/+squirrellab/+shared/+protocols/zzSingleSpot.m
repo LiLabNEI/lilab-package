@@ -1,4 +1,4 @@
-classdef SingleSpot < nih.squirrellab.shared.protocols.RiekeLabStageProtocol
+classdef SingleSpot < nih.squirrellab.shared.protocols.SquirrelLabStageProtocol
     % Presents a set of single spot stimuli to a Stage canvas and records from the specified amplifier.
     
     properties
@@ -20,7 +20,7 @@ classdef SingleSpot < nih.squirrellab.shared.protocols.RiekeLabStageProtocol
     methods
         
         function didSetRig(obj)
-            didSetRig@nih.squirrellab.shared.protocols.RiekeLabStageProtocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.SquirrelLabStageProtocol(obj);
             
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
         end
@@ -35,7 +35,7 @@ classdef SingleSpot < nih.squirrellab.shared.protocols.RiekeLabStageProtocol
         end
         
         function prepareRun(obj)
-            prepareRun@nih.squirrellab.shared.protocols.RiekeLabStageProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabStageProtocol(obj);
             
             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.amp));
             obj.showFigure('nih.squirrellab.shared.figures.MeanResponseFigure', obj.rig.getDevice(obj.amp));
@@ -64,7 +64,7 @@ classdef SingleSpot < nih.squirrellab.shared.protocols.RiekeLabStageProtocol
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@nih.squirrellab.shared.protocols.RiekeLabStageProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabStageProtocol(obj, epoch);
             
             device = obj.rig.getDevice(obj.amp);
             duration = (obj.preTime + obj.stimTime + obj.tailTime) / 1e3;
@@ -73,7 +73,7 @@ classdef SingleSpot < nih.squirrellab.shared.protocols.RiekeLabStageProtocol
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@nih.squirrellab.shared.protocols.RiekeLabStageProtocol(obj, interval);
+            prepareInterval@nih.squirrellab.shared.protocols.SquirrelLabStageProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.amp);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);

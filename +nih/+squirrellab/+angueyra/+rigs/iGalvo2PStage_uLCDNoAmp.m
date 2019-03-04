@@ -1,13 +1,13 @@
-classdef RigA_OneAmpUlcd < squirrellab.rigs.RigA_OneAmpStage
-       
-    methods
+classdef iGalvo2PStage_uLCDNonAmp < squirrellab.rigs.iGalvo2PStage_NonAmp   
+ 
+   methods
         
-        function obj = RigA_OneAmpUlcd()
+        function obj = iGalvo2PStage_uLCDOneAmp()
             import symphonyui.builtin.devices.*;
             
             uLCD = squirrellab.devices.uLCDDevice('comPort','COM9');
-%             uLCD.serial.connect();           
-%             fprintf('Initialized uLCD\n')
+            uLCD.serial.connect();           
+            fprintf('Initialized uLCD\n')
             % Binding the uLCD to an unused stream only so its configuration settings are written to each epoch.
             daq = obj.daqController;
             uLCD.bindStream(daq.getStream('doport0'));
@@ -19,4 +19,3 @@ classdef RigA_OneAmpUlcd < squirrellab.rigs.RigA_OneAmpStage
         
     end
 end
-    

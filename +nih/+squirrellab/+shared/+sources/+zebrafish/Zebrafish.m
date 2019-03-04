@@ -1,4 +1,4 @@
-classdef Zebrafish < squirrellab.sources.Subject
+classdef Zebrafish < nih.squirrellab.shared.sources.Subject
     
     methods
         

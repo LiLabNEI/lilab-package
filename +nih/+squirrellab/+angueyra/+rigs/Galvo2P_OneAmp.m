@@ -1,8 +1,8 @@
-classdef iTwoPhoton_OneAmp < symphonyui.core.descriptions.RigDescription
+classdef iGalvo2P_OneAmp < symphonyui.core.descriptions.RigDescription
     
     methods
         
-        function obj = iTwoPhoton_OneAmp()
+        function obj = iGalvo2P_OneAmp()
             import symphonyui.builtin.daqs.*;
             import symphonyui.builtin.devices.*;
             import symphonyui.core.*;

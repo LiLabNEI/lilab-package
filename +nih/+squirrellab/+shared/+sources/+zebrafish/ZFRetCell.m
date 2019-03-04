@@ -1,10 +1,10 @@
-classdef ZFRetCell < squirrellab.sources.RetCell
+classdef ZFRetCell < nih.squirrellab.shared.sources.RetCell
     
     methods
         
         function obj = ZFRetCell()
             import symphonyui.core.*;
-            obj.addAllowableParentType('squirrellab.sources.zebrafish.ZFRetPrep');
+            obj.addAllowableParentType('nih.squirrellab.shared.sources.zebrafish.ZFRetPrep');
         end
         
     end

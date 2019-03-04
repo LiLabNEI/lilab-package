@@ -1,4 +1,4 @@
-classdef stgFullFieldNoise < io.github.stage_vss.protocols.StageProtocol
+classdef stgFullFieldNoise < nih.squirrellab.shared.protocols.SquirrelLabStageProtocol
     
     properties
         amp                             % Output amplifier
@@ -36,8 +36,9 @@ classdef stgFullFieldNoise < io.github.stage_vss.protocols.StageProtocol
             prepareRun@io.github.stage_vss.protocols.StageProtocol(obj);
             
             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('symphonyui.builtin.figures.MeanResponseFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('io.github.stage_vss.figures.FrameTimingFigure', obj.rig.getDevice('Stage'));
+            obj.showFigure('nih.squirrellab.shared.figures.MeanResponseFigure', obj.rig.getDevice(obj.amp));
+            % obj.showFigure('io.github.stage_vss.figures.FrameTimingFigure', obj.rig.getDevice('Stage'));
+            obj.showFigure('nih.squirrellab.shared.figures.FrameTimingFigure', obj.rig.getDevice('Stage'), obj.rig.getDevice('Frame Monitor'));
         end
         
         function p = createPresentation(obj)
@@ -74,6 +75,15 @@ classdef stgFullFieldNoise < io.github.stage_vss.protocols.StageProtocol
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);
         end
         
+        function controllerDidStartHardware(obj)
+            controllerDidStartHardware@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
+            if obj.numEpochsPrepared == 1
+                obj.rig.getDevice('Stage').play(obj.createPresentation());
+            else
+                obj.rig.getDevice('Stage').replay();
+            end
+        end
+		
         function tf = shouldContinuePreparingEpochs(obj)
             tf = obj.numEpochsPrepared < obj.numberOfAverages;
         end

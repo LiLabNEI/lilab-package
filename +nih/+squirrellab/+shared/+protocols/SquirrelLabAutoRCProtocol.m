@@ -1,6 +1,6 @@
 classdef (Abstract) SquirrelLabAutoRCProtocol < nih.squirrellab.shared.protocols.SquirrelLabProtocol
-% delivers a 5 mV voltage pulse every time protocol is run to keep track
-% of access resistance and membrane capacitance
+	% delivers a 5 mV voltage pulse every run to keep track of access resistance and membrane capacitance
+	% Created Mar_2017 (Angueyra)
 
     properties
        autoRC = true;
@@ -36,12 +36,10 @@ classdef (Abstract) SquirrelLabAutoRCProtocol < nih.squirrellab.shared.protocols
         
         function updateFigure(obj, custFigObj, epoch)
             if obj.numEpochsCompleted == 0 && obj.RCEpochsCompleted == 1
-                disp('init')
                 obj.plotData.figure = custFigObj.getFigureHandle();
                 obj.plotData.axes = axes('Parent', obj.plotData.figure, 'NextPlot', 'replace');
                 
-                
-                % plot three lines of zero
+                % initialize plot lines
                 totPts = obj.getRCTotalPts();
                 timePts = (1:totPts) / obj.sampleRate;
                 obj.plotData.lines = cell(1,1);
@@ -61,7 +59,6 @@ classdef (Abstract) SquirrelLabAutoRCProtocol < nih.squirrellab.shared.protocols
         
         
         function prepareEpoch(obj, epoch)
-%           prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, epoch);
             % add remperature controller monitor
             T5Controller = obj.rig.getDevices('T5Controller');
             if ~isempty(T5Controller)
@@ -81,7 +78,7 @@ classdef (Abstract) SquirrelLabAutoRCProtocol < nih.squirrellab.shared.protocols
                 epoch.addStimulus(obj.rig.getDevice(obj.amp), obj.createRCStimulus());
                 epoch.addResponse(obj.rig.getDevice(obj.amp));
                 obj.RCEpochsPrepared = obj.RCEpochsPrepared + 1;
-                fprintf('yas RC: %g of %g\n',obj.RCEpochsPrepared,obj.RCnumberOfAverages)
+                fprintf('ran RC: %g of %g\n',obj.RCEpochsPrepared,obj.RCnumberOfAverages)
 			else
 				obj.runRC = false;
                 obj.numEpochsPrepared = obj.numEpochsPrepared + 1;
@@ -91,7 +88,6 @@ classdef (Abstract) SquirrelLabAutoRCProtocol < nih.squirrellab.shared.protocols
         end
         
         function completeEpoch(obj, epoch)
-
             if epoch.parameters.isKey('RCepoch')
                 if epoch.parameters('RCepoch')
                     obj.RCEpochsCompleted = obj.RCEpochsCompleted + 1;

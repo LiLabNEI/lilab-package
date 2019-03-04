@@ -1,10 +1,10 @@
-classdef MouseRetCell < squirrellab.sources.RetCell
+classdef MouseRetCell < nih.squirrellab.shared.sources.RetCell
     
     methods
         
         function obj = MouseRetCell()
             import symphonyui.core.*;
-            obj.addAllowableParentType('squirrellab.sources.mouse.MouseRetPrep');
+            obj.addAllowableParentType('nih.squirrellab.shared.sources.mouse.MouseRetPrep');
         end
         
     end

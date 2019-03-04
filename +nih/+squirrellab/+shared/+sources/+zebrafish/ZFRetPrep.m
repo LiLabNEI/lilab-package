@@ -37,7 +37,7 @@ classdef ZFRetPrep < symphonyui.core.persistent.descriptions.SourceDescription
             obj.addProperty('region', {}, ...
     			'type', PropertyType('cellstr', 'row', {'superior', 'inferior', 'nasal', 'temporal'}));
             
-            obj.addAllowableParentType('squirrellab.sources.zebrafish.Zebrafish');
+            obj.addAllowableParentType('nih.squirrellab.shared.sources.zebrafish.Zebrafish');
         end
         
     end

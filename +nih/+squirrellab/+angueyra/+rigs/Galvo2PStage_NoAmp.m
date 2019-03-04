@@ -1,28 +1,15 @@
-classdef iTwoPhoton_TwoAmp < symphonyui.core.descriptions.RigDescription
+classdef iGalvo2PStage_NoAmp < symphonyui.core.descriptions.RigDescription
     
     methods
         
-        function obj = iTwoPhoton_TwoAmp()
+        function obj = iGalvo2PStage_NoAmp()
             import symphonyui.builtin.daqs.*;
             import symphonyui.builtin.devices.*;
             import symphonyui.core.*;
             
             daq = HekaDaqController();
             obj.daqController = daq;
-            
-             amp1 = AxopatchDevice('Amp1').bindStream(daq.getStream('ao0'));
-             amp1.bindStream(daq.getStream('ai0'), AxopatchDevice.SCALED_OUTPUT_STREAM_NAME);
-             amp1.bindStream(daq.getStream('ai1'), AxopatchDevice.GAIN_TELEGRAPH_STREAM_NAME);
-             %missing frequency input here (is that the low pass filter value?)
-             amp1.bindStream(daq.getStream('ai3'), AxopatchDevice.MODE_TELEGRAPH_STREAM_NAME);
-             obj.addDevice(amp1);
-            
-             amp2 = AxopatchDevice('Amp2').bindStream(daq.getStream('ao1'));
-             amp2.bindStream(daq.getStream('ai4'), AxopatchDevice.SCALED_OUTPUT_STREAM_NAME);
-             amp2.bindStream(daq.getStream('ai5'), AxopatchDevice.GAIN_TELEGRAPH_STREAM_NAME);
-             amp2.bindStream(daq.getStream('ai6'), AxopatchDevice.MODE_TELEGRAPH_STREAM_NAME);
-             obj.addDevice(amp2);
-            
+
             frame = UnitConvertingDevice('FrameMonitor', symphonyui.core.Measurement.UNITLESS).bindStream(daq.getStream('diport0'));
             daq.getStream('diport0').setBitPosition(frame, 0);
             obj.addDevice(frame);
@@ -48,6 +35,8 @@ classdef iTwoPhoton_TwoAmp < symphonyui.core.descriptions.RigDescription
             daq.getStream('doport1').setBitPosition(trigger, 0);
             obj.addDevice(trigger);
             
+            stage = io.github.stage_vss.devices.StageDevice('localhost');
+            obj.addDevice(stage);
         end
         
     end

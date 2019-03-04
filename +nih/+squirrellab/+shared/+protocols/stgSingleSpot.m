@@ -1,15 +1,15 @@
-classdef stgSingleSpot < io.github.stage_vss.protocols.StageProtocol
+classdef SingleSpot < nih.squirrellab.shared.protocols.SquirrelLabStageProtocol
+    % Presents a set of single spot stimuli to a Stage canvas and records from the specified amplifier.
     
     properties
         amp                             % Output amplifier
-        preTime = 500                   % Spot leading duration (ms)
-        stimTime = 1000                 % Spot duration (ms)
-        tailTime = 500                  % Spot trailing duration (ms)
+        preTime = 250                   % Spot leading duration (ms)
+        stimTime = 250                  % Spot duration (ms)
+        tailTime = 250                  % Spot trailing duration (ms)
         spotIntensity = 1.0             % Spot light intensity (0-1)
-        spotDiameter = 20              % Spot diameter size (pixels)
-        backgroundIntensity = 0.0       % Background light intensity (0-1)
-        centerOffset = [0, 0]           % Spot [x, y] center offset (pixels)
-        numberOfAverages = uint16(1)    % Number of epochs
+        spotDiameter = 300              % Spot diameter size (um)
+        backgroundIntensity = 0.5       % Background light intensity (0-1)
+        numberOfAverages = uint16(5)    % Number of epochs
         interpulseInterval = 0          % Duration between spots (s)
     end
     
@@ -20,7 +20,7 @@ classdef stgSingleSpot < io.github.stage_vss.protocols.StageProtocol
     methods
         
         function didSetRig(obj)
-            didSetRig@io.github.stage_vss.protocols.StageProtocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.SquirrelLabStageProtocol(obj);
             
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
         end
@@ -35,33 +35,36 @@ classdef stgSingleSpot < io.github.stage_vss.protocols.StageProtocol
         end
         
         function prepareRun(obj)
-            prepareRun@io.github.stage_vss.protocols.StageProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabStageProtocol(obj);
             
-%             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.amp));
-%             obj.showFigure('symphonyui.builtin.figures.MeanResponseFigure', obj.rig.getDevice(obj.amp));
-%             obj.showFigure('io.github.stage_vss.figures.FrameTimingFigure', obj.rig.getDevice('Stage'));
+            obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('nih.squirrellab.shared.figures.MeanResponseFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('nih.squirrellab.shared.figures.FrameTimingFigure', obj.rig.getDevice('Stage'), obj.rig.getDevice('Frame Monitor'));
         end
         
         function p = createPresentation(obj)
-            canvasSize = obj.rig.getDevice('Stage').getCanvasSize();
+            device = obj.rig.getDevice('Stage');
+            canvasSize = device.getCanvasSize();
+            
+            spotDiameterPix = device.um2pix(obj.spotDiameter);
             
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
             p.setBackgroundColor(obj.backgroundIntensity);
             
             spot = stage.builtin.stimuli.Ellipse();
             spot.color = obj.spotIntensity;
-            spot.radiusX = obj.spotDiameter/2;
-            spot.radiusY = obj.spotDiameter/2;
-            spot.position = canvasSize/2 + obj.centerOffset;
+            spot.radiusX = spotDiameterPix/2;
+            spot.radiusY = spotDiameterPix/2;
+            spot.position = canvasSize/2;
             p.addStimulus(spot);
             
-            spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', @(state)state.time >= obj.preTime * 1e-3 && state.time < (obj.preTime + obj.stimTime) * 1e-3);
-%             spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', @(state)nih.squirrellab.shared.stage2.VisibleController(state));
+            spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', ...
+                @(state)state.time >= obj.preTime * 1e-3 && state.time < (obj.preTime + obj.stimTime) * 1e-3);
             p.addController(spotVisible);
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@io.github.stage_vss.protocols.StageProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabStageProtocol(obj, epoch);
             
             device = obj.rig.getDevice(obj.amp);
             duration = (obj.preTime + obj.stimTime + obj.tailTime) / 1e3;
@@ -70,10 +73,19 @@ classdef stgSingleSpot < io.github.stage_vss.protocols.StageProtocol
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@io.github.stage_vss.protocols.StageProtocol(obj, interval);
+            prepareInterval@nih.squirrellab.shared.protocols.SquirrelLabStageProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.amp);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);
+        end
+        
+        function controllerDidStartHardware(obj)
+            controllerDidStartHardware@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
+            if obj.numEpochsPrepared == 1
+                obj.rig.getDevice('Stage').play(obj.createPresentation());
+            else
+                obj.rig.getDevice('Stage').replay();
+            end
         end
         
         function tf = shouldContinuePreparingEpochs(obj)

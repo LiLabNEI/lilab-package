@@ -1,10 +1,10 @@
-classdef MkRetPrep < squirrellab.sources.RetPrep
+classdef MkRetPrep < nih.squirrellab.shared.sources.RetPrep
     
     methods
         
         function obj = MkRetPrep()
             import symphonyui.core.*;
-            obj.addAllowableParentType('squirrellab.sources.monkey.Monkey');
+            obj.addAllowableParentType('nih.squirrellab.shared.sources.monkey.Monkey');
         end
         
     end
