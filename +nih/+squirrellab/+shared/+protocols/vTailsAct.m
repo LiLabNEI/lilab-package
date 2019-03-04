@@ -1,4 +1,9 @@
-classdef vTailsAct < squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.protocols.SquirrelLabAutoRCNoiseSineProtocol
+classdef vTailsAct < nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol
+    % Presents a set of voltage stimuli to a specified amplifier and records from the same amplifier.
+	% Stimulus is designed to measure the activation curve of Ih
+	% Mar_2019 (Angueyra): Lacks implementation leak subtraction (easiest would be small amplitude steps)
+	% Mar_2019 (Angueyra): Lacks support for 2 amps
+	% Mar_2019 (Angueyra): Lacks dedicated figure handler for online analysis
     
     properties
         amp                             % Output amplifier
@@ -25,8 +30,7 @@ classdef vTailsAct < squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrella
     methods
         
         function didSetRig(obj)
-%             didSetRig@squirrellab.protocols.SquirrelLabAutoRCNoiseSineProtocol(obj);
-            didSetRig@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj);
             
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
         end
@@ -42,15 +46,15 @@ classdef vTailsAct < squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrella
         end
         
         function prepareRun(obj)           
-            prepareRun@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj);
             
-            obj.showFigure('squirrellab.figures.DataFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('squirrellab.figures.AverageFigure', obj.rig.getDevice(obj.amp), ...
+            obj.showFigure('nih.squirrellab.shared.figures.DataFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('nih.squirrellab.shared.figures.AverageFigure', obj.rig.getDevice(obj.amp), ...
                     'groupBy', {'preactSignal'});
-            obj.showFigure('squirrellab.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, ...
+            obj.showFigure('nih.squirrellab.shared.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, ...
                 'baselineRegion', [0 obj.preTime], ...
                 'measurementRegion', [0 obj.preTime]);
-            obj.showFigure('squirrellab.figures.ProgressFigure', obj.numberOfAverages * obj.pulsesInFamily);
+            obj.showFigure('nih.squirrellab.shared.figures.ProgressFigure', obj.numberOfAverages * obj.pulsesInFamily);
         end
         
         function [stim, preactSignal, preactDelay] = createAmpStimulus(obj, pulseNum)
@@ -94,7 +98,7 @@ classdef vTailsAct < squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrella
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj, epoch);
             if obj.runRC
                 % Superclass runs RC epoch
             else %run normally
@@ -111,7 +115,7 @@ classdef vTailsAct < squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrella
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj, interval);
+            prepareInterval@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.amp);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);

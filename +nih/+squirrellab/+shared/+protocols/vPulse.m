@@ -1,4 +1,5 @@
-classdef vPulse < squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.protocols.SquirrelLabAutoRCNoiseSineProtocol
+classdef vPulse < nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol
+	% Presents a set of rectangular pulse stimuli to a specified amplifier and records from the same amplifier.
     
     properties
         amp                             % Output amplifier
@@ -6,6 +7,14 @@ classdef vPulse < squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.p
         stimTime = 500                  % Pulse duration (ms)
         tailTime = 50                   % Pulse trailing duration (ms)
         pulseAmplitude = 100            % Pulse amplitude (mV or pA)
+    end
+			
+    properties (Dependent, SetAccess = private)
+        amp2                            % Secondary amplifier
+    end
+
+    properties
+        amp2PulseAmplitude = 0          % Pulse amplitude for secondary amp (mV or pA depending on amp2 mode)
         numberOfAverages = uint16(5)    % Number of epochs
         interpulseInterval = 0          % Duration between pulses (s)
     end
@@ -18,10 +27,17 @@ classdef vPulse < squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.p
     methods
         
         function didSetRig(obj)
-%             didSetRig@squirrellab.protocols.SquirrelLabAutoRCNoiseSineProtocol(obj);
-            didSetRig@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj);
             
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
+        end
+		
+        function d = getPropertyDescriptor(obj, name)
+            d = getPropertyDescriptor@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, name);
+        
+            if strncmp(name, 'amp2', 4) && numel(obj.rig.getDeviceNames('Amp')) < 2
+                d.isHidden = true;
+            end
         end
         
         function p = getPreview(obj, panel)
@@ -29,14 +45,25 @@ classdef vPulse < squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.p
         end
         
         function prepareRun(obj)
-            prepareRun@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj);
             
-            obj.showFigure('squirrellab.figures.DataFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('squirrellab.figures.AverageFigure', obj.rig.getDevice(obj.amp),'prepts',obj.timeToPts(obj.preTime));
-            obj.showFigure('squirrellab.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, ...
-                'baselineRegion', [0 obj.preTime], ...
-                'measurementRegion', [0 obj.preTime]);%'measurementRegion', [obj.preTime obj.preTime+obj.stimTime]);
-            obj.showFigure('squirrellab.figures.ProgressFigure', obj.numberOfAverages);
+	        if numel(obj.rig.getDeviceNames('Amp')) < 2
+	            obj.showFigure('nih.squirrellab.shared.figures.DataFigure', obj.rig.getDevice(obj.amp));
+	            obj.showFigure('nih.squirrellab.shared.figures.AverageFigure', obj.rig.getDevice(obj.amp),'prepts',obj.timeToPts(obj.preTime));
+	            obj.showFigure('nih.squirrellab.shared.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, ...
+	                'baselineRegion', [0 obj.preTime], ...
+	                'measurementRegion', [0 obj.preTime]);%'measurementRegion', [obj.preTime obj.preTime+obj.stimTime]);
+	        else
+	            obj.showFigure('nih.squirrellab.shared.figures.DualResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2));
+	            obj.showFigure('nih.squirrellab.shared.figures.DualMeanResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2));
+	            obj.showFigure('nih.squirrellab.shared.figures.DualResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, obj.rig.getDevice(obj.amp2), {@mean, @var}, ...
+	                'baselineRegion1', [0 obj.preTime], ...
+	                'measurementRegion1', [obj.preTime obj.preTime+obj.stimTime], ...
+	                'baselineRegion2', [0 obj.preTime], ...
+	                'measurementRegion2', [obj.preTime obj.preTime+obj.stimTime]);
+	        end
+				
+            obj.showFigure('nih.squirrellab.shared.figures.ProgressFigure', obj.numberOfAverages);
         end
         
         function stim = createAmpStimulus(obj)
@@ -52,20 +79,39 @@ classdef vPulse < squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.p
             
             stim = gen.generate();
         end
+			
+        function stim = createAmp2Stimulus(obj)
+            gen = symphonyui.builtin.stimuli.PulseGenerator();
+        
+            gen.preTime = obj.preTime;
+            gen.stimTime = obj.stimTime;
+            gen.tailTime = obj.tailTime;
+            gen.amplitude = obj.amp2PulseAmplitude;
+            gen.mean = obj.rig.getDevice(obj.amp2).background.quantity;
+            gen.sampleRate = obj.sampleRate;
+            gen.units = obj.rig.getDevice(obj.amp2).background.displayUnits;
+        
+            stim = gen.generate();
+        end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj, epoch);
             if obj.runRC
                 % Superclass runs RC epoch
             else %run normally
                 epoch.addParameter('pulseSignal', obj.pulseAmplitude+obj.rig.getDevice(obj.amp).background.quantity);
                 epoch.addStimulus(obj.rig.getDevice(obj.amp), obj.createAmpStimulus());
                 epoch.addResponse(obj.rig.getDevice(obj.amp));
+	            
+				if numel(obj.rig.getDeviceNames('Amp')) >= 2
+	                epoch.addStimulus(obj.rig.getDevice(obj.amp2), obj.createAmp2Stimulus());
+	                epoch.addResponse(obj.rig.getDevice(obj.amp2));
+	            end
             end
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj, interval);
+            prepareInterval@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.amp);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);
@@ -77,6 +123,16 @@ classdef vPulse < squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.p
         
         function tf = shouldContinueRun(obj)
             tf = obj.numEpochsCompleted < obj.numberOfAverages;
+        end
+			
+        function a = get.amp2(obj)
+            amps = obj.rig.getDeviceNames('Amp');
+            if numel(amps) < 2
+                a = '(None)';
+            else
+                i = find(~ismember(amps, obj.amp), 1);
+                a = amps{i};
+            end
         end
         
     end

@@ -28,6 +28,10 @@ classdef BackgroundControl < symphonyui.ui.Module
             obj.turnLedsOffTool = obj.toolbar.addPushTool( ...
                 'Label', 'Turn LEDs Off', ...
                 'Callback', @obj.onSelectedTurnLedsOff);
+			
+            obj.zeroVcmd = obj.toolbar.addPushTool( ...
+                'Label', 'Vcmd = 0', ...
+                'Callback', @obj.onSelectedzeroVcmd);
             
             mainLayout = uix.VBox( ...
                 'Parent', figureHandle);
@@ -126,7 +130,19 @@ classdef BackgroundControl < symphonyui.ui.Module
                 end
             end
         end
+					
+        function onSelectedzeroVcmd(obj, ~, ~)
+            obj.deviceGrid.StopEditing();
+            amps = obj.configurationService.getDevices('Amp');
+            for i = 1:numel(amps)
+                amp = amps{i};
+                amp.background = symphonyui.core.Measurement(0, amp.background.displayUnits);
+                amp.applyBackground();
+            end
+        end
         
+		
+		
         function onSetBackground(obj, ~, event)
             p = event.Property;
             device = obj.configurationService.getDevice(p.Name);

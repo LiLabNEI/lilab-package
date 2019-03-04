@@ -3,7 +3,7 @@ classdef (Abstract) SquirrelLabProtocol < symphonyui.core.Protocol
     methods
         function prepareEpoch(obj, epoch)
             prepareEpoch@symphonyui.core.Protocol(obj, epoch);
-            % add remperature controller monitor
+            % add temperature controller monitor
             T5Controller = obj.rig.getDevices('T5Controller');
             if ~isempty(T5Controller)
                 epoch.addResponse(T5Controller{1});

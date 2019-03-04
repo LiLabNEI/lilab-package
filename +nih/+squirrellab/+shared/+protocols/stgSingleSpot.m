@@ -56,7 +56,7 @@ classdef stgSingleSpot < io.github.stage_vss.protocols.StageProtocol
             p.addStimulus(spot);
             
             spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', @(state)state.time >= obj.preTime * 1e-3 && state.time < (obj.preTime + obj.stimTime) * 1e-3);
-%             spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', @(state)squirrellab.stage2.VisibleController(state));
+%             spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', @(state)nih.squirrellab.shared.stage2.VisibleController(state));
             p.addController(spotVisible);
         end
         

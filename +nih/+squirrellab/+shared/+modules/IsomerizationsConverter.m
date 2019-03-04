@@ -24,7 +24,7 @@ classdef IsomerizationsConverter < symphonyui.ui.Module
         
         function obj = IsomerizationsConverter()
             obj.log = log4m.LogManager.getLogger(class(obj));
-            obj.settings = edu.washington.riekelab.modules.settings.IsomerizationsConverterSettings();
+            obj.settings = nih.squirrellab.sharedmodules.settings.IsomerizationsConverterSettings();
         end
 
         function createUi(obj, figureHandle)
@@ -700,7 +700,7 @@ classdef IsomerizationsConverter < symphonyui.ui.Module
             else
                 isom = str2double(value);
                 collectingArea = getCollectingArea(photoreceptors(event.fieldName).collectingArea, path, orientation);
-                voltsOrIntensity = edu.washington.riekelab.util.convisom(isom, 'isom', factor, spectrum, ...
+                voltsOrIntensity = nih.squirrellab.sharedutil.convisom(isom, 'isom', factor, spectrum, ...
                     photoreceptors(event.fieldName).spectrum, collectingArea, ndfs, attenuations);
                 set(obj.converterControls.fields(units).control, 'String', num2str(voltsOrIntensity, '%.4f'));
             end
@@ -710,7 +710,7 @@ classdef IsomerizationsConverter < symphonyui.ui.Module
             for i = 1:numel(names)
                 n = names{i};
                 collectingArea = getCollectingArea(photoreceptors(n).collectingArea, path, orientation);
-                isom = edu.washington.riekelab.util.convisom(voltsOrIntensity, units, factor, spectrum, ...
+                isom = nih.squirrellab.sharedutil.convisom(voltsOrIntensity, units, factor, spectrum, ...
                     photoreceptors(n).spectrum, collectingArea, ndfs, attenuations);
                 set(obj.converterControls.fields(n).control, 'String', num2str(isom, '%.0f'));
             end

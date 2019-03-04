@@ -1,4 +1,4 @@
-classdef Wash < squirrellab.epochgroups.EpochGroup
+classdef Wash < nih.squirrellab.shared.epochgroups.EpochGroup
     
     methods
         

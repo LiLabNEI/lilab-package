@@ -1,4 +1,4 @@
-classdef Control < squirrellab.epochgroups.EpochGroup
+classdef Control < nih.squirrellab.shared.epochgroups.EpochGroup
     
     methods
         

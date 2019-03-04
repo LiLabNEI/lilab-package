@@ -1,4 +1,4 @@
-classdef Drug < squirrellab.epochgroups.EpochGroup
+classdef Drug < nih.squirrellab.shared.epochgroups.EpochGroup
     
     methods
         

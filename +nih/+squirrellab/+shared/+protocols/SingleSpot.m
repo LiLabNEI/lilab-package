@@ -1,4 +1,4 @@
-classdef SingleSpot < edu.washington.riekelab.protocols.RiekeLabStageProtocol
+classdef SingleSpot < nih.squirrellab.shared.protocols.RiekeLabStageProtocol
     % Presents a set of single spot stimuli to a Stage canvas and records from the specified amplifier.
     
     properties
@@ -20,7 +20,7 @@ classdef SingleSpot < edu.washington.riekelab.protocols.RiekeLabStageProtocol
     methods
         
         function didSetRig(obj)
-            didSetRig@edu.washington.riekelab.protocols.RiekeLabStageProtocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.RiekeLabStageProtocol(obj);
             
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
         end
@@ -35,11 +35,11 @@ classdef SingleSpot < edu.washington.riekelab.protocols.RiekeLabStageProtocol
         end
         
         function prepareRun(obj)
-            prepareRun@edu.washington.riekelab.protocols.RiekeLabStageProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.RiekeLabStageProtocol(obj);
             
             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('edu.washington.riekelab.figures.MeanResponseFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('edu.washington.riekelab.figures.FrameTimingFigure', obj.rig.getDevice('Stage'), obj.rig.getDevice('Frame Monitor'));
+            obj.showFigure('nih.squirrellab.shared.figures.MeanResponseFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('nih.squirrellab.shared.figures.FrameTimingFigure', obj.rig.getDevice('Stage'), obj.rig.getDevice('Frame Monitor'));
         end
         
         function p = createPresentation(obj)
@@ -64,7 +64,7 @@ classdef SingleSpot < edu.washington.riekelab.protocols.RiekeLabStageProtocol
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@edu.washington.riekelab.protocols.RiekeLabStageProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.RiekeLabStageProtocol(obj, epoch);
             
             device = obj.rig.getDevice(obj.amp);
             duration = (obj.preTime + obj.stimTime + obj.tailTime) / 1e3;
@@ -73,14 +73,14 @@ classdef SingleSpot < edu.washington.riekelab.protocols.RiekeLabStageProtocol
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@edu.washington.riekelab.protocols.RiekeLabStageProtocol(obj, interval);
+            prepareInterval@nih.squirrellab.shared.protocols.RiekeLabStageProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.amp);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);
         end
         
         function controllerDidStartHardware(obj)
-            controllerDidStartHardware@edu.washington.riekelab.protocols.RiekeLabProtocol(obj);
+            controllerDidStartHardware@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             if obj.numEpochsPrepared == 1
                 obj.rig.getDevice('Stage').play(obj.createPresentation());
             else

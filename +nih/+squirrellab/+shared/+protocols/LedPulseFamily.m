@@ -1,4 +1,4 @@
-classdef ledPulseFamily < squirrellab.protocols.SquirrelLabProtocol
+classdef ledPulseFamily < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     
     properties
         led                             % Output LED
@@ -22,7 +22,7 @@ classdef ledPulseFamily < squirrellab.protocols.SquirrelLabProtocol
     methods
         
         function didSetRig(obj)
-            didSetRig@squirrellab.protocols.SquirrelLabProtocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             
             [obj.led, obj.ledType] = obj.createDeviceNamesProperty('LED');
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
@@ -39,13 +39,13 @@ classdef ledPulseFamily < squirrellab.protocols.SquirrelLabProtocol
         end
         
         function prepareRun(obj)
-            prepareRun@squirrellab.protocols.SquirrelLabProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             
-            obj.showFigure('squirrellab.figures.DataFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('squirrellab.figures.AverageFigure', obj.rig.getDevice(obj.amp), ...
+            obj.showFigure('nih.squirrellab.shared.figures.DataFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('nih.squirrellab.shared.figures.AverageFigure', obj.rig.getDevice(obj.amp), ...
                 'prepts',obj.timeToPts(obj.preTime),...
                 'groupBy', {'lightAmplitude'});
-            obj.showFigure('squirrellab.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, ...
+            obj.showFigure('nih.squirrellab.shared.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, ...
                 'baselineRegion', [0 obj.preTime], ...
                 'measurementRegion', [obj.preTime obj.preTime+obj.stimTime]);
             
@@ -69,7 +69,7 @@ classdef ledPulseFamily < squirrellab.protocols.SquirrelLabProtocol
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@squirrellab.protocols.SquirrelLabProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, epoch);
             
             pulseNum = mod(obj.numEpochsPrepared - 1, obj.pulsesInFamily) + 1;
             [stim, lightAmplitude] = obj.createLedStimulus(pulseNum);
@@ -80,7 +80,7 @@ classdef ledPulseFamily < squirrellab.protocols.SquirrelLabProtocol
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@squirrellab.protocols.SquirrelLabProtocol(obj, interval);
+            prepareInterval@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.led);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);

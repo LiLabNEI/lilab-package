@@ -1,4 +1,4 @@
-classdef (Abstract) SquirrelLabProtocolStage < squirrellab.protocols.SquirrelLabProtocol
+classdef (Abstract) SquirrelLabProtocolStage < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     
     methods (Abstract)
         p = createPresentation(obj);
@@ -7,7 +7,7 @@ classdef (Abstract) SquirrelLabProtocolStage < squirrellab.protocols.SquirrelLab
     methods
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@squirrellab.protocols.SquirrelLabProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, epoch);
 %             epoch.shouldWaitForTrigger = true; %external trigger start Symphony
             
 %             % frame monitor from spatial stimulus for timing issues
@@ -18,7 +18,7 @@ classdef (Abstract) SquirrelLabProtocolStage < squirrellab.protocols.SquirrelLab
         end
         
         function controllerDidStartHardware(obj)
-            controllerDidStartHardware@squirrellab.protocols.SquirrelLabProtocol(obj);
+            controllerDidStartHardware@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             obj.rig.getDevice('Stage').play(obj.createPresentation());
         end
         
@@ -31,12 +31,12 @@ classdef (Abstract) SquirrelLabProtocolStage < squirrellab.protocols.SquirrelLab
         end
         
         function completeRun(obj)
-            completeRun@squirrellab.protocols.SquirrelLabProtocol(obj);
+            completeRun@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             obj.rig.getDevice('Stage').clearMemory();
         end
         
         function [tf, msg] = isValid(obj)
-            [tf, msg] = isValid@squirrellab.protocols.SquirrelLabProtocol(obj);
+            [tf, msg] = isValid@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             if tf
                 tf = ~isempty(obj.rig.getDevices('Stage'));
                 msg = 'No stage';

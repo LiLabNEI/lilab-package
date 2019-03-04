@@ -19,7 +19,7 @@ classdef DeviceConfigurator < symphonyui.ui.Module
         
         function obj = DeviceConfigurator()
             obj.log = log4m.LogManager.getLogger(class(obj));
-            obj.settings = edu.washington.riekelab.modules.settings.DeviceConfiguratorSettings();
+            obj.settings = nih.squirrellab.sharedmodules.settings.DeviceConfiguratorSettings();
         end
         
         function createUi(obj, figureHandle)

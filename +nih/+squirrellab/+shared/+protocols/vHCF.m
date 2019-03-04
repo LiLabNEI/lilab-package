@@ -1,8 +1,8 @@
-classdef vHCF <  squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.protocols.SquirrelLabAutoRCNoiseSineProtocol
-    % Protocol to stimulate feedback to cones while voltage-clamping a
-    % horizontal cell. Consists of a sum of 2 vSteps, first to -30 mV then
-    % briefly to -90 mV (Vm in this protocol are defined in absolute value
-    % instead of relative to holding potential).
+classdef vHCF <  nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol 
+    % Protocol to stimulate feedback to cones while voltage-clamping a horizontal cell.
+	% Also triggers imaging.
+	% Consists of a sum of 2 vSteps, first to -30 mV then briefly to -90 mV 
+	% (Vm in this protocol are defined in absolute value instead of relative to holding potential).
     % Follows protocol from Warren, vanHook, et. al, J.NeuroSci (2016)
     properties
         amp                             % Output amplifier
@@ -30,8 +30,7 @@ classdef vHCF <  squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.pr
     methods
         
         function didSetRig(obj)
-%             didSetRig@squirrellab.protocols.SquirrelLabAutoRCNoiseSineProtocol(obj);
-            didSetRig@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj);
             
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
             [obj.frame, obj.frameType] = obj.createDeviceNamesProperty('FrameMonitor');
@@ -42,15 +41,15 @@ classdef vHCF <  squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.pr
         end
         
         function prepareRun(obj)
-            prepareRun@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj);
            
-            obj.showFigure('squirrellab.figures.DataFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('squirrellab.figures.AverageFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('squirrellab.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @std}, ...
+            obj.showFigure('nih.squirrellab.shared.figures.DataFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('nih.squirrellab.shared.figures.AverageFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('nih.squirrellab.shared.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @std}, ...
                 'baselineRegion', [0 obj.preTime], ...
                 'measurementRegion', [0 obj.preTime]);
-            obj.showFigure('squirrellab.figures.ResponseFigure', obj.rig.getDevice(obj.frame));
-            obj.showFigure('squirrellab.figures.ProgressFigure', obj.numberOfAverages);
+            obj.showFigure('nih.squirrellab.shared.figures.ResponseFigure', obj.rig.getDevice(obj.frame));
+            obj.showFigure('nih.squirrellab.shared.figures.ProgressFigure', obj.numberOfAverages);
         end
         
         function stim = createTriggerStimulus(obj)
@@ -93,7 +92,7 @@ classdef vHCF <  squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.pr
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj, epoch);
             if obj.runRC
                 % Superclass runs RC epoch
             else %run normally
@@ -110,7 +109,7 @@ classdef vHCF <  squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.pr
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj, interval);
+            prepareInterval@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.amp);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);

@@ -1,4 +1,4 @@
-classdef vNoise <  squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.protocols.SquirrelLabAutoRCNoiseSineProtocol
+classdef vNoise <  nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol 
     % Presents families of gaussian noise stimuli to a specified amplifier and records responses from a specified amplifier.
     % Each family consists of a set of noise stimuli with the standard deviation of noise starting at startStdv. Each
     % standard deviation value is repeated repeatsPerStdv times before moving to the next standard deviation value which
@@ -50,14 +50,13 @@ classdef vNoise <  squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.
         end
         
         function didSetRig(obj)
-%             didSetRig@squirrellab.protocols.SquirrelLabAutoRCNoiseSineProtocol(obj);
-            didSetRig@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj);
             
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
         end
         
         function d = getPropertyDescriptor(obj, name)
-            d = getPropertyDescriptor@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj, name);
+            d = getPropertyDescriptor@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj, name);
             
             if strncmp(name, 'amp2', 4) && numel(obj.rig.getDeviceNames('Amp')) < 2
                 d.isHidden = true;
@@ -80,23 +79,23 @@ classdef vNoise <  squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.
         end
         
         function prepareRun(obj)
-            prepareRun@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj);
             
             if numel(obj.rig.getDeviceNames('Amp')) < 2
-                obj.showFigure('squirrellab.figures.DataFigure', obj.rig.getDevice(obj.amp));
-                obj.showFigure('squirrellab.figures.ProgressFigure', obj.numberOfAverages * obj.pulsesInFamily);
-                obj.showFigure('squirrellab.figures.AverageFigure', obj.rig.getDevice(obj.amp), ...
+                obj.showFigure('nih.squirrellab.shared.figures.DataFigure', obj.rig.getDevice(obj.amp));
+                obj.showFigure('nih.squirrellab.shared.figures.ProgressFigure', obj.numberOfAverages * obj.pulsesInFamily);
+                obj.showFigure('nih.squirrellab.shared.figures.AverageFigure', obj.rig.getDevice(obj.amp), ...
                     'prePts', obj.timeToPts(obj.preTime), ...
                     'groupBy', {'stdv'});
-                obj.showFigure('squirrellab.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @std}, ...
+                obj.showFigure('nih.squirrellab.shared.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @std}, ...
                     'baselineRegion', [0 obj.preTime], ...
                     'measurementRegion', [obj.preTime obj.preTime+obj.stimTime]);
             else
-                obj.showFigure('edu.washington.riekelab.figures.DualResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2));
-                obj.showFigure('edu.washington.riekelab.figures.DualMeanResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2), ...
+                obj.showFigure('nih.squirrellab.shared.figures.DualResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2));
+                obj.showFigure('nih.squirrellab.shared.figures.DualMeanResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2), ...
                     'groupBy1', {'stdv'}, ...
                     'groupBy2', {'stdv'});
-                obj.showFigure('edu.washington.riekelab.figures.DualResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, obj.rig.getDevice(obj.amp2), {@mean, @var}, ...
+                obj.showFigure('nih.squirrellab.shared.figures.DualResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, obj.rig.getDevice(obj.amp2), {@mean, @var}, ...
                     'baselineRegion1', [0 obj.preTime], ...
                     'measurementRegion1', [obj.preTime obj.preTime+obj.stimTime], ...
                     'baselineRegion2', [0 obj.preTime], ...
@@ -109,7 +108,7 @@ classdef vNoise <  squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.
             sdNum = floor((double(pulseNum) - 1) / double(obj.repeatsPerStdv));
             stdv = obj.stdvMultiplier^sdNum * obj.startStdv;
             
-            gen = squirrellab.stimuli.GaussianNoiseGeneratorV2();
+            gen = nih.squirrellab.shared.stimuli.GaussianNoiseGeneratorV2();
             
             gen.preTime = obj.preTime;
             gen.stimTime = obj.stimTime;
@@ -126,7 +125,7 @@ classdef vNoise <  squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj, epoch);
             
             persistent seed;
             if ~obj.useRandomSeed
@@ -149,7 +148,7 @@ classdef vNoise <  squirrellab.protocols.SquirrelLabAutoRCProtocol %squirrellab.
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj, interval);
+            prepareInterval@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.amp);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);

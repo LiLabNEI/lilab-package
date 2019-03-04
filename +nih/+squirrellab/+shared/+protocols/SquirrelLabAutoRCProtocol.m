@@ -1,4 +1,4 @@
-classdef (Abstract) SquirrelLabAutoRCProtocol < squirrellab.protocols.SquirrelLabProtocol
+classdef (Abstract) SquirrelLabAutoRCProtocol < nih.squirrellab.shared.protocols.SquirrelLabProtocol
 % delivers a 5 mV voltage pulse every time protocol is run to keep track
 % of access resistance and membrane capacitance
 
@@ -22,13 +22,13 @@ classdef (Abstract) SquirrelLabAutoRCProtocol < squirrellab.protocols.SquirrelLa
     methods
         
         function prepareRun(obj)
-            prepareRun@squirrellab.protocols.SquirrelLabProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             obj.RCEpochsCompleted = 0;
             obj.RCEpochsPrepared = 0;
             if obj.autoRC
                 obj.runRC = true;
                 % Open RC figure
-                obj.showFigure('squirrellab.figures.RCFigure', @obj.updateFigure);
+                obj.showFigure('nih.squirrellab.shared.figures.RCFigure', @obj.updateFigure);
             else
                 obj.runRC = false;
             end
@@ -61,7 +61,7 @@ classdef (Abstract) SquirrelLabAutoRCProtocol < squirrellab.protocols.SquirrelLa
         
         
         function prepareEpoch(obj, epoch)
-%           prepareEpoch@squirrellab.protocols.SquirrelLabProtocol(obj, epoch);
+%           prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, epoch);
             % add remperature controller monitor
             T5Controller = obj.rig.getDevices('T5Controller');
             if ~isempty(T5Controller)
@@ -101,12 +101,12 @@ classdef (Abstract) SquirrelLabAutoRCProtocol < squirrellab.protocols.SquirrelLa
                     warning('Epoch is labeled as RCepoch but RCepoch is false\n')
                 end
             else
-                completeEpoch@squirrellab.protocols.SquirrelLabProtocol(obj, epoch);
+                completeEpoch@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, epoch);
             end
         end
         
         function completeRun(obj)
-            completeRun@squirrellab.protocols.SquirrelLabProtocol(obj);
+            completeRun@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
         end
         function stim = createRCStimulus(obj)
             gen = symphonyui.builtin.stimuli.PulseGenerator();

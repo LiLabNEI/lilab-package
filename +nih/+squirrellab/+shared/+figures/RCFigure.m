@@ -1,5 +1,5 @@
 classdef RCFigure < symphonyui.core.FigureHandler
-    % Delegates to a specified callback function to handle creating and updating the controls of the figure.
+    % Dedicated figure to RC epochs that run at the start of every run
     
     properties
         userData

@@ -1,4 +1,4 @@
-classdef LedNoiseFamily < edu.washington.riekelab.protocols.RiekeLabProtocol
+classdef LedNoiseFamily < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     % Presents families of gaussian noise stimuli to a specified LED and records responses from a specified amplifier.
     % Each family consists of a set of noise stimuli with the standard deviation of noise starting at startStdv. Each
     % standard deviation value is repeated repeatsPerStdv times before moving to the next standard deviation value which
@@ -50,14 +50,14 @@ classdef LedNoiseFamily < edu.washington.riekelab.protocols.RiekeLabProtocol
         end
         
         function didSetRig(obj)
-            didSetRig@edu.washington.riekelab.protocols.RiekeLabProtocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             
             [obj.led, obj.ledType] = obj.createDeviceNamesProperty('LED');
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
         end
         
         function d = getPropertyDescriptor(obj, name)
-            d = getPropertyDescriptor@edu.washington.riekelab.protocols.RiekeLabProtocol(obj, name);
+            d = getPropertyDescriptor@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, name);
             
             if strncmp(name, 'amp2', 4) && numel(obj.rig.getDeviceNames('Amp')) < 2
                 d.isHidden = true;
@@ -80,7 +80,7 @@ classdef LedNoiseFamily < edu.washington.riekelab.protocols.RiekeLabProtocol
         end
         
         function prepareRun(obj)
-            prepareRun@edu.washington.riekelab.protocols.RiekeLabProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             
             if numel(obj.rig.getDeviceNames('Amp')) < 2
                 obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.amp));
@@ -90,11 +90,11 @@ classdef LedNoiseFamily < edu.washington.riekelab.protocols.RiekeLabProtocol
                     'baselineRegion', [0 obj.preTime], ...
                     'measurementRegion', [obj.preTime obj.preTime+obj.stimTime]);
             else
-                obj.showFigure('edu.washington.riekelab.figures.DualResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2));
-                obj.showFigure('edu.washington.riekelab.figures.DualMeanResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2), ...
+                obj.showFigure('nih.squirrellab.shared.figures.DualResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2));
+                obj.showFigure('nih.squirrellab.shared.figures.DualMeanResponseFigure', obj.rig.getDevice(obj.amp), obj.rig.getDevice(obj.amp2), ...
                     'groupBy1', {'stdv'}, ...
                     'groupBy2', {'stdv'});
-                obj.showFigure('edu.washington.riekelab.figures.DualResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, obj.rig.getDevice(obj.amp2), {@mean, @var}, ...
+                obj.showFigure('nih.squirrellab.shared.figures.DualResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, obj.rig.getDevice(obj.amp2), {@mean, @var}, ...
                     'baselineRegion1', [0 obj.preTime], ...
                     'measurementRegion1', [obj.preTime obj.preTime+obj.stimTime], ...
                     'baselineRegion2', [0 obj.preTime], ...
@@ -109,7 +109,7 @@ classdef LedNoiseFamily < edu.washington.riekelab.protocols.RiekeLabProtocol
             sdNum = floor((double(pulseNum) - 1) / double(obj.repeatsPerStdv));
             stdv = obj.stdvMultiplier^sdNum * obj.startStdv;
             
-            gen = edu.washington.riekelab.stimuli.GaussianNoiseGeneratorV2();
+            gen = nih.squirrellab.shared.stimuli.GaussianNoiseGeneratorV2();
             
             gen.preTime = obj.preTime;
             gen.stimTime = obj.stimTime;
@@ -133,7 +133,7 @@ classdef LedNoiseFamily < edu.washington.riekelab.protocols.RiekeLabProtocol
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@edu.washington.riekelab.protocols.RiekeLabProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, epoch);
             
             persistent seed;
             if ~obj.useRandomSeed
@@ -156,7 +156,7 @@ classdef LedNoiseFamily < edu.washington.riekelab.protocols.RiekeLabProtocol
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@edu.washington.riekelab.protocols.RiekeLabProtocol(obj, interval);
+            prepareInterval@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.led);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);

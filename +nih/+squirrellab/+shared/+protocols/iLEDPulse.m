@@ -1,7 +1,7 @@
-classdef iLEDPulse< squirrellab.protocols.SquirrelLabProtocol
-    % LED pulse while doing 2P imaging and not using electrophysiology
-    % amplififer
-    % Will still collect frame timing and temperature
+classdef iLEDPulse< nih.squirrellab.shared.protocols.SquirrelLabProtocol
+    % LED pulse that also triigers 2P imaging
+	% Not using electrophysiology amplififer
+    % Collects frame timing and temperature
     properties
         led                             % Output LED
         preTime = 1000                    % Pulse leading duration (ms)
@@ -69,7 +69,7 @@ classdef iLEDPulse< squirrellab.protocols.SquirrelLabProtocol
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@squirrellab.protocols.SquirrelLabProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, epoch);
             
             % generate trigger
             trigger = obj.rig.getDevices('Trigger');
