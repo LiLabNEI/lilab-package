@@ -52,34 +52,15 @@ classdef SingleSpot < io.github.stage_vss.protocols.StageProtocol
             spot.color = obj.spotIntensity;
             spot.radiusX = obj.spotDiameter/2;
             spot.radiusY = obj.spotDiameter/2;
-            spot.position = canvasSize/2 - obj.centerOffset; % + obj.centerOffset - [450 0];
+            spot.position = canvasSize/2 - obj.centerOffset;
             p.addStimulus(spot);
-            
-            p0 = spot.position;
-            
-            function p = spotPosition(state) %#ok<INUSD>
-                speed = 1000*900/obj.stimTime;
-                p = p0 + [speed*state.time 0];   %spot.position + 5*randn(1,2);
 
-%                 if window.getKeyState(GLFW.GLFW_KEY_UP)
-%                     p(2) = p(2) + 1;
-%                 end
-%                 if window.getKeyState(GLFW.GLFW_KEY_DOWN)
-%                     p(2) = p(2) - 1;
-%                 end
-%                 if window.getKeyState(GLFW.GLFW_KEY_LEFT)
-%                     p(1) = p(1) - 1;
-%                 end
-%                 if window.getKeyState(GLFW.GLFW_KEY_RIGHT)
-%                     p(1) = p(1) + 1;
-%                 end
-            end
             
             function v = toggleVis(state)
+                
                 v = spot.visible;
                 if state.time >= obj.preTime*1e-3 && v == false && state.time < (obj.preTime + obj.stimTime) * 1e-3
                     disp(['turning spot on @ t = ' num2str(state.time)]);
-%                 state
                 elseif state.time >= (obj.preTime + obj.stimTime) * 1e-3  && v == true
                     disp(['turning spot off @ t = ' num2str(state.time)]);
                     disp('');
@@ -88,17 +69,9 @@ classdef SingleSpot < io.github.stage_vss.protocols.StageProtocol
                 v = state.time >= obj.preTime * 1e-3 && state.time < (obj.preTime + obj.stimTime) * 1e-3 ;
             end
             
-            %Weird, kind of a hacky way to control the spot visibility.
-            spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', @(state)toggleVis(state));
-            spotMove = stage.builtin.controllers.PropertyController(spot, 'position', @(state)spotPosition(state));
-            
-            spotGrowX = stage.builtin.controllers.PropertyController(spot, 'radiusX', @(state)(100 + 0*(state.time)));
-            spotGrowY = stage.builtin.controllers.PropertyController(spot, 'radiusY', @(state)(100 + 0*(state.time)));
-%             
+            spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', @(state)toggleVis(state));         
             p.addController(spotVisible);
-%             p.addController(spotMove);
-%             p.addController(spotGrowX);
-%             p.addController(spotGrowY);
+
         end
         
         function prepareEpoch(obj, epoch)

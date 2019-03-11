@@ -1,8 +1,8 @@
-classdef iGalvo2PStage_uLCDNonAmp < squirrellab.rigs.iGalvo2PStage_NonAmp   
+classdef iGalvo2PStage_uLCDNoAmp < nih.squirrellab.angueyra.rigs.iGalvo2PStage_NoAmp   
  
    methods
         
-        function obj = iGalvo2PStage_uLCDOneAmp()
+        function obj = iGalvo2PStage_uLCDNoAmp()
             import symphonyui.builtin.devices.*;
             
             uLCD = squirrellab.devices.uLCDDevice('comPort','COM9');

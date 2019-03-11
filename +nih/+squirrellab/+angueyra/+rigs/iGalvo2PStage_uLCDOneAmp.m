@@ -1,4 +1,4 @@
-classdef iGalvo2PStage_uLCDOneAmp < squirrellab.rigs.iGalvo2PStage_OneAmp
+classdef iGalvo2PStage_uLCDOneAmp < nih.squirrellab.angueyra.rigs.iGalvo2PStage_OneAmp
 
     methods
         

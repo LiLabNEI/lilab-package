@@ -1,4 +1,4 @@
-classdef ledPulse < nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef LedPulse < nih.squirrellab.shared.protocols.SquirrelLabProtocol
 	% Presents a set of rectangular pulse stimuli to a specified LED and records from a specified amplifier.
     
     properties

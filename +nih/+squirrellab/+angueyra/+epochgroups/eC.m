@@ -1,4 +1,4 @@
-classdef eC < squirrellab.epochgroups.EpochGroup
+classdef eC < nih.squirrellab.shared.epochgroups.EpochGroup %squirrellab.epochgroups.EpochGroup
     
     methods
         

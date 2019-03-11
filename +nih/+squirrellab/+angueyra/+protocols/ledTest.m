@@ -1,4 +1,4 @@
-classdef ledTest < squirrellab.protocols.SquirrelLabAutoRCProtocol
+classdef ledTest < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     
     properties
         led                             % Output LED
@@ -21,7 +21,7 @@ classdef ledTest < squirrellab.protocols.SquirrelLabAutoRCProtocol
     methods
         
         function didSetRig(obj)
-            didSetRig@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj);
             
             [obj.led, obj.ledType] = obj.createDeviceNamesProperty('LED');
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
@@ -32,11 +32,11 @@ classdef ledTest < squirrellab.protocols.SquirrelLabAutoRCProtocol
         end
         
         function prepareRun(obj)
-            prepareRun@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj);
             
-            obj.showFigure('squirrellab.figures.DataFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('squirrellab.figures.AverageFigure', obj.rig.getDevice(obj.amp),'prepts',obj.timeToPts(obj.preTime));
-            obj.showFigure('squirrellab.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, ...
+            obj.showFigure('nih.squirrellab.shared.figures.DataFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('nih.squirrellab.shared.figures.AverageFigure', obj.rig.getDevice(obj.amp),'prepts',obj.timeToPts(obj.preTime));
+            obj.showFigure('nih.squirrellab.shared.figures.ResponseStatisticsFigure', obj.rig.getDevice(obj.amp), {@mean, @var}, ...
                 'baselineRegion', [0 obj.preTime], ...
                 'measurementRegion', [obj.preTime obj.preTime+obj.stimTime]);
             
@@ -58,7 +58,7 @@ classdef ledTest < squirrellab.protocols.SquirrelLabAutoRCProtocol
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@squirrellab.protocols.SquirrelLabAutoRCProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabAutoRCProtocol(obj, epoch);
             if obj.runRC
                 % Superclass runs RC epoch
             else %run normally
@@ -68,7 +68,7 @@ classdef ledTest < squirrellab.protocols.SquirrelLabAutoRCProtocol
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@squirrellab.protocols.SquirrelLabProtocol(obj, interval);
+            prepareInterval@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.led);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);

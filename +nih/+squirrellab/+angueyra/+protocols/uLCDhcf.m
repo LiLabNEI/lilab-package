@@ -1,4 +1,4 @@
-classdef uLCDhcf < squirrellab.protocols.SquirrelLabStageProtocol %io.github.stage_vss.protocols.StageProtocol
+classdef uLCDhcf < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     
     properties
         amp                             % Output amplifier
@@ -42,8 +42,8 @@ classdef uLCDhcf < squirrellab.protocols.SquirrelLabStageProtocol %io.github.sta
         function prepareRun(obj)
             prepareRun@io.github.stage_vss.protocols.StageProtocol(obj);
             
-            obj.showFigure('squirrellab.figures.DataFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('squirrellab.figures.AverageFigure', obj.rig.getDevice(obj.amp),obj.timeToPts(obj.preTime));
+            obj.showFigure('nih.squirrellab.shared.figures.DataFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('nih.squirrellab.shared.figures.AverageFigure', obj.rig.getDevice(obj.amp),obj.timeToPts(obj.preTime));
         end
         
         function p = createPresentation(obj)
@@ -53,7 +53,7 @@ classdef uLCDhcf < squirrellab.protocols.SquirrelLabStageProtocol %io.github.sta
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
             p.setBackgroundColor(0);
             
-            uStim=squirrellab.stimuli.uLCDCenterSurroundGenerator();
+            uStim=nih.squirrellab.angueyra.stimuli.uLCDCenterSurroundGenerator();
             uStim.centerX=obj.centerX;
             uStim.centerY=obj.centerY;
             uStim.preTime=obj.preTime*1e-3;
@@ -65,7 +65,7 @@ classdef uLCDhcf < squirrellab.protocols.SquirrelLabStageProtocol %io.github.sta
             uStim.ringRadius=obj.ringRadius;
             p.addStimulus(uStim);
             
-            uLCDCMD = stage.builtin.controllers.PropertyController(uStim, 'cmdCount', @(state)squirrellab.stage2.uLCDCenterSurroundController(state));
+            uLCDCMD = stage.builtin.controllers.PropertyController(uStim, 'cmdCount', @(state)nih.squirrellab.angueyra.stage2.uLCDCenterSurroundController(state));
             p.addController(uLCDCMD);
             
             center = stage.builtin.stimuli.Ellipse();

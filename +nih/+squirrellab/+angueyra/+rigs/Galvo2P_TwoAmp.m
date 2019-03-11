@@ -1,8 +1,8 @@
-classdef iGalvo2P_TwoAmp < symphonyui.core.descriptions.RigDescription
+classdef Galvo2P_TwoAmp < symphonyui.core.descriptions.RigDescription
     
     methods
         
-        function obj = iGalvo2P_TwoAmp()
+        function obj = Galvo2P_TwoAmp()
             import symphonyui.builtin.daqs.*;
             import symphonyui.builtin.devices.*;
             import symphonyui.core.*;

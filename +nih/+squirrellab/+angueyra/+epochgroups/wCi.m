@@ -1,4 +1,4 @@
-classdef wCi < squirrellab.epochgroups.EpochGroup
+classdef wCi < nih.squirrellab.shared.epochgroups.EpochGroup %squirrellab.epochgroups.EpochGroup
     
     methods
         

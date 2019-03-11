@@ -1,4 +1,4 @@
-classdef ulcdGridSpot < squirrellab.protocols.SquirrelLabStageProtocol %io.github.stage_vss.protocols.StageProtocol
+classdef ulcdGridSpot < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     % Creates an led pulsecombined with a uLCD spots laid on a grid.
     % Grid's origin at startX and startY
     % Spot is created during preTime, cleared during tailTime
@@ -82,8 +82,8 @@ classdef ulcdGridSpot < squirrellab.protocols.SquirrelLabStageProtocol %io.githu
                 obj.randOrder=1:obj.nTotal;
             end
             
-%             obj.showFigure('squirrellab.figures.DataFigure', obj.rig.getDevice(obj.amp));
-            obj.showFigure('squirrellab.figures.uLCDGridResponseFigure', obj.rig.getDevice(obj.amp),...
+%             obj.showFigure('nih.squirrellab.shared.figures.DataFigure', obj.rig.getDevice(obj.amp));
+            obj.showFigure('nih.squirrellab.angueyra.figures.uLCDGridResponseFigure', obj.rig.getDevice(obj.amp),...
                 'prepts',obj.timeToPts(obj.preTime),...
                 'stmpts',obj.timeToPts(obj.stimTime),...
                 'datapts',obj.timeToPts(obj.preTime+obj.stimTime+obj.tailTime),...
@@ -93,7 +93,7 @@ classdef ulcdGridSpot < squirrellab.protocols.SquirrelLabStageProtocol %io.githu
                 'nX',obj.nX,...
                 'nY',obj.nY,...
                 'nTrials',obj.nTotal);
-            obj.showFigure('squirrellab.figures.uLCDgridRFFigure', obj.rig.getDevice(obj.amp),...
+            obj.showFigure('nih.squirrellab.angueyra.figures.uLCDgridRFFigure', obj.rig.getDevice(obj.amp),...
                 'prepts',obj.timeToPts(obj.preTime),...
                 'stmpts',obj.timeToPts(obj.stimTime),...
                 'delaypts',obj.timeToPts(50/1000),...
@@ -124,7 +124,7 @@ classdef ulcdGridSpot < squirrellab.protocols.SquirrelLabStageProtocol %io.githu
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
             p.setBackgroundColor(0);
             
-            uStim=squirrellab.stimuli.uLCDMaskSpotGenerator();
+            uStim=nih.squirrellab.angueyra.stimuli.uLCDMaskSpotGenerator();
             uStim.preTime=obj.preTime*1e-3;
             uStim.stimTime=obj.stimTime*1e-3;
             uStim.tailTime=obj.tailTime*1e-3;          
@@ -133,7 +133,7 @@ classdef ulcdGridSpot < squirrellab.protocols.SquirrelLabStageProtocol %io.githu
             uStim.centerY=obj.currentY;
             p.addStimulus(uStim);
             
-            uLCDCMD = stage.builtin.controllers.PropertyController(uStim, 'cmdCount', @(state)squirrellab.stage2.uLCDGridSpotController(state));
+            uLCDCMD = stage.builtin.controllers.PropertyController(uStim, 'cmdCount', @(state)nih.squirrellab.angueyra.stage2.uLCDGridSpotController(state));
             p.addController(uLCDCMD);
             
             center = stage.builtin.stimuli.Ellipse();

@@ -1,4 +1,4 @@
-classdef aSealAndLeak < squirrellab.protocols.SquirrelLabProtocol
+classdef aSealAndLeak < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     
     properties
         amp                             % Output amplifier
@@ -32,7 +32,7 @@ classdef aSealAndLeak < squirrellab.protocols.SquirrelLabProtocol
         end
         
         function didSetRig(obj)
-            didSetRig@squirrellab.protocols.SquirrelLabProtocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             
             [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
         end
@@ -46,7 +46,7 @@ classdef aSealAndLeak < squirrellab.protocols.SquirrelLabProtocol
         end
         
         function prepareRun(obj)
-            prepareRun@squirrellab.protocols.SquirrelLabProtocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             
             if isempty(obj.modeFigure) || ~isvalid(obj.modeFigure)
                 obj.modeFigure = obj.showFigure('symphonyui.builtin.figures.CustomFigure', @null);
@@ -98,7 +98,7 @@ classdef aSealAndLeak < squirrellab.protocols.SquirrelLabProtocol
         end
         
         function prepareEpoch(obj, epoch)
-            prepareEpoch@squirrellab.protocols.SquirrelLabProtocol(obj, epoch);
+            prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, epoch);
             
             devices = obj.rig.getInputDevices();
             for i = 1:numel(devices)
@@ -127,7 +127,7 @@ classdef aSealAndLeak < squirrellab.protocols.SquirrelLabProtocol
         end
         
         function completeRun(obj)
-            completeRun@squirrellab.protocols.SquirrelLabProtocol(obj);
+            completeRun@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             
             if obj.alternateMode
                 if strcmpi(obj.mode, 'seal')

@@ -1,4 +1,4 @@
-classdef SingleSpot < nih.squirrellab.shared.protocols.SquirrelLabStageProtocol
+classdef stgSingleSpot < nih.squirrellab.shared.protocols.SquirrelLabStageProtocol
     % Presents a set of single spot stimuli to a Stage canvas and records from the specified amplifier.
     
     properties

@@ -108,7 +108,7 @@ classdef SingleSpotLcrControl < io.github.stage_vss.protocols.StageProtocol
             spotSineModulate = stage.builtin.controllers.PropertyController(spot, 'color', @(state)[1 1 1]*(0.5+sin(1*pi*state.time)));
 %             
             p.addController(spotVisible);
-            p.addController(spotSineModulate);
+%             p.addController(spotSineModulate);
 %             p.addController(spotMove);
 %             p.addController(spotGrowX);
 %             p.addController(spotGrowY);

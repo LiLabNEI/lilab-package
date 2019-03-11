@@ -1,8 +1,8 @@
-classdef iGalvo2PStage_OneAmp < symphonyui.core.descriptions.RigDescription
+classdef Galvo2PStage_OneAmp < symphonyui.core.descriptions.RigDescription
     
     methods
         
-        function obj = iGalvo2PStage_OneAmp()
+        function obj = Galvo2PStage_OneAmp()
             import symphonyui.builtin.daqs.*;
             import symphonyui.builtin.devices.*;
             import symphonyui.core.*;

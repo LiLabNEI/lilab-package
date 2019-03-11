@@ -1,8 +1,8 @@
-classdef iGalvo2P_NonAmp < symphonyui.core.descriptions.RigDescription
+classdef iGalvo2P_NoAmp < symphonyui.core.descriptions.RigDescription
     
     methods
         
-        function obj = iGalvo2P_NonAmp()
+        function obj = iGalvo2P_NoAmp()
             import symphonyui.builtin.daqs.*;
             import symphonyui.builtin.devices.*;
             import symphonyui.core.*;

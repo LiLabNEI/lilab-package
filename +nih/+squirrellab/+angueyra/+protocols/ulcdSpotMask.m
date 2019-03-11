@@ -1,4 +1,4 @@
-classdef ulcdSpotMask < squirrellab.protocols.SquirrelLabStageProtocol %io.github.stage_vss.protocols.StageProtocol
+classdef ulcdSpotMask < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     % Display a spot mask on uLCD permanently until cleared
     properties
         amp                             % Output amplifier
@@ -35,7 +35,7 @@ classdef ulcdSpotMask < squirrellab.protocols.SquirrelLabStageProtocol %io.githu
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
             p.setBackgroundColor(0);
             
-            uStim=squirrellab.stimuli.uLCDMaskSpotGenerator();
+            uStim=nih.squirrellab.angueyra.stimuli.uLCDMaskSpotGenerator();
             uStim.centerX=obj.centerX;
             uStim.centerY=obj.centerY;
             uStim.preTime=obj.preTime*1e-3;
@@ -44,7 +44,7 @@ classdef ulcdSpotMask < squirrellab.protocols.SquirrelLabStageProtocol %io.githu
             uStim.spotRadius=obj.spotRadius;
             p.addStimulus(uStim);
             
-            uLCDCMD = stage.builtin.controllers.PropertyController(uStim, 'cmdCount', @(state)squirrellab.stage2.uLCDMaskSpotController(state));
+            uLCDCMD = stage.builtin.controllers.PropertyController(uStim, 'cmdCount', @(state)nih.squirrellab.angueyra.stage2.uLCDMaskSpotController(state));
             p.addController(uLCDCMD);
         end
         
