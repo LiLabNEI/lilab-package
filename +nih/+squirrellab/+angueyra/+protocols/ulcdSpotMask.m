@@ -1,4 +1,4 @@
-classdef uLCDSpotMask < nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef ulcdSpotMask < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     % Display a spot mask on uLCD permanently until cleared
     properties
         amp                             % Output amplifier

@@ -141,7 +141,7 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
             %This is a generic digital output (on digital output channel 1--the second channel) used to trigger other
             %devices. In present configuration, all "i" Protocols send a trigger at the beginning of run to trigger imaging form SciScan.
 			%This requires enabling trigger in SciScan and starting "RECORD"
-            sciscanTrigger = UnitConvertingDevice('SciScan trigger', symphonyui.core.Measurement.UNITLESS).bindStream(daq.getStream('doport1'));
+            sciscanTrigger = UnitConvertingDevice('sciscanTrigger', symphonyui.core.Measurement.UNITLESS).bindStream(daq.getStream('doport1'));
             daq.getStream('doport1').setBitPosition(sciscanTrigger, 0);
             obj.addDevice(sciscanTrigger);
             

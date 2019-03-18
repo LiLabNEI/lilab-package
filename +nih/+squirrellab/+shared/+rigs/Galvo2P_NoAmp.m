@@ -1,6 +1,6 @@
-classdef Galvo2p < symphonyui.core.descriptions.RigDescription
+classdef Galvo2p_NoAmp < symphonyui.core.descriptions.RigDescription
     
-%     Galvo2P - This rig description intializes the following rig
+%     Galvo2P_NoAmp - This rig description intializes the following rig
 %     configuration:
 %     
 %     Digital acquisition board: Heka ITC-18
@@ -35,7 +35,7 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
     
     methods
         
-        function obj = Galvo2p()
+        function obj = Galvo2p_NoAmp()
             
             import symphonyui.builtin.daqs.*;
             import symphonyui.builtin.devices.*;
@@ -100,7 +100,7 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
             %This is a generic digital output (on digital output channel 1--the second channel) used to trigger other
             %devices. In present configuration, all "i" Protocols send a trigger at the beginning of run to trigger imaging form SciScan.
 			%This requires enabling trigger in SciScan and starting "RECORD"
-            sciscanTrigger = UnitConvertingDevice('SciScan trigger', symphonyui.core.Measurement.UNITLESS).bindStream(daq.getStream('doport1'));
+            sciscanTrigger = UnitConvertingDevice('sciscanTrigger', symphonyui.core.Measurement.UNITLESS).bindStream(daq.getStream('doport1'));
             daq.getStream('doport1').setBitPosition(sciscanTrigger, 0);
             obj.addDevice(sciscanTrigger);
             

@@ -1,4 +1,4 @@
-classdef uLCDGridSpot < nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef ulcdGridSpot < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     % Creates an led pulsec ombined with a uLCD spots laid on a grid.
     % Grid's origin at startX and startY
     % Spot is created during preTime, cleared during tailTime

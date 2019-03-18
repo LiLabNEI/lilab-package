@@ -1,4 +1,4 @@
-classdef uLCDhcfLED < nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef ulcdHCFLED < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     
     properties
         amp                             % Output amplifier

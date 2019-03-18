@@ -1,4 +1,4 @@
-classdef Galvo2P_uLCD_OneAmp < nih.squirrellab.shared.rigs.Galvo2PPlusStage   
+classdef Galvo2p_uLCD_OneAmp < nih.squirrellab.shared.rigs.Galvo2pPlusStage   
 
 %     Galvo2P_uLCD_NoAmp - This rig description is identical to Galvo2PPlusStage, but
 %     includes uLCD from 4D systems to be controlled through serial commands
@@ -8,7 +8,7 @@ classdef Galvo2P_uLCD_OneAmp < nih.squirrellab.shared.rigs.Galvo2PPlusStage
 
    methods
         
-        function obj = Galvo2P_uLCD_OneAmp()
+        function obj = Galvo2p_uLCD_OneAmp()
             import symphonyui.builtin.devices.*;
             
 			% need to check that this is the right port

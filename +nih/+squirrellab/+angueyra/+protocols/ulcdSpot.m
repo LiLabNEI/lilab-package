@@ -1,4 +1,4 @@
-classdef uLCDSpot < nih.squirrellab.shared.protocols.SquirrelLabProtocol 
+classdef ulcdSpot < nih.squirrellab.shared.protocols.SquirrelLabProtocol 
     
     properties
         amp                             % Output amplifier
