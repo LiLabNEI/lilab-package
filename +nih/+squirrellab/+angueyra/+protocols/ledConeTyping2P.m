@@ -110,12 +110,12 @@ classdef ledConeTyping2P < nih.squirrellab.shared.protocols.SquirrelLabProtocol
             stim = gen.generate();
         end
         
-        function amp = determineAmplitude(obj, epochNum)
+        function amplitude = determineAmplitude(obj, epochNum)
            idx = mod(epochNum - 1, 2) + 1;
            if idx == 1
-               amp = obj.lLEDAmplitude;
+               amplitude = obj.lLEDAmplitude;
            elseif idx == 2
-               amp  = obj.sLEDAmplitude;
+               amplitude  = obj.sLEDAmplitude;
            end
         end
         

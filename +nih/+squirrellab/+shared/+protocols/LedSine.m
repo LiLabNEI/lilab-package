@@ -4,13 +4,13 @@ classdef ledSine < nih.squirrellab.shared.protocols.SquirrelLabProtocol
 	
     properties
         led                             % Output LED
-        preTime = 100                    % Pulse leading duration (ms)
-        stimTime = 1000                  % Pulse duration (ms)
+        preTime = 100                   % Pulse leading duration (ms)
+        stimTime = 1000                 % Pulse duration (ms)
         tailTime = 100                  % Pulse trailing duration (ms)
         lightMean = 5                   % Pulse and LED background mean (V)
         lightAmplitude = 2              % Pulse amplitude (V)
         phaseShift = 0                  % Phase
-        sineFreq = 5                  % Phase
+        sineFreq = 5                  	% Frequency (Hz)
 		amp
 	end
 	

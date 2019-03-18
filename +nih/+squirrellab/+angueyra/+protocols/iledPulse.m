@@ -1,4 +1,4 @@
-classdef iLEDPulse< nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef iledPulse < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     % LED pulse that also triigers 2P imaging
 	% Not using electrophysiology amplififer
     % Collects frame timing and temperature
@@ -22,7 +22,7 @@ classdef iLEDPulse< nih.squirrellab.shared.protocols.SquirrelLabProtocol
     methods
         
         function didSetRig(obj)
-            didSetRig@symphonyui.core.Protocol(obj);
+            didSetRig@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             
             [obj.led, obj.ledType] = obj.createDeviceNamesProperty('LED');
             [obj.frame, obj.frameType] = obj.createDeviceNamesProperty('FrameMonitor');
@@ -33,7 +33,7 @@ classdef iLEDPulse< nih.squirrellab.shared.protocols.SquirrelLabProtocol
         end
         
         function prepareRun(obj)
-            prepareRun@symphonyui.core.Protocol(obj);
+            prepareRun@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj);
             
             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.frame));
             
@@ -73,18 +73,16 @@ classdef iLEDPulse< nih.squirrellab.shared.protocols.SquirrelLabProtocol
             
             % generate trigger
             sciscanTrigger = obj.rig.getDevices('sciscanTrigger');
-
             if ~isempty(sciscanTrigger)            
                 epoch.addStimulus(sciscanTrigger{1}, obj.createTriggerStimulus());
             end
-            
             
             epoch.addStimulus(obj.rig.getDevice(obj.led), obj.createLedStimulus());
             epoch.addResponse(obj.rig.getDevice(obj.frame));
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@symphonyui.core.Protocol(obj, interval);
+            prepareInterval@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, interval);
             
             device = obj.rig.getDevice(obj.led);
             interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);
