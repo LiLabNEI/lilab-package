@@ -107,6 +107,20 @@ classdef iledNoiseFamily < nih.squirrellab.shared.protocols.SquirrelLabProtocol
             stim = gen.generate();
         end
         
+        function stim = createTriggerStimulus(obj)
+            gen = symphonyui.builtin.stimuli.PulseGenerator();
+            
+            gen.preTime = 0;
+            gen.stimTime = 1;
+            gen.tailTime = obj.preTime + obj.stimTime + obj.tailTime - 1;
+            gen.amplitude = 1;
+            gen.mean = 0;
+            gen.sampleRate = obj.sampleRate;
+            gen.units = symphonyui.core.Measurement.UNITLESS;
+            
+            stim = gen.generate();
+        end
+        
         function prepareEpoch(obj, epoch)
             prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, epoch);
             

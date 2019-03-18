@@ -52,7 +52,7 @@ classdef Galvo2p_NoAmp < symphonyui.core.descriptions.RigDescription
             obj.addDevice(frame);
 
             %Initializing the UV LED on analog output 2 (the third analog output)
-            mx405LED = UnitConvertingDevice('UV LED 405nm', 'V','manufacturer','Mightex').bindStream(daq.getStream('ao2'));
+            mx405LED = UnitConvertingDevice('mx405LED', 'V','manufacturer','Mightex').bindStream(daq.getStream('ao2'));
             
             %Configuration settings like this mean nothing for the actual
             %LED; they're only used to keep records of what you use (but
@@ -71,7 +71,7 @@ classdef Galvo2p_NoAmp < symphonyui.core.descriptions.RigDescription
 			
             
             %Initializing the Amber LED on analog output 3 (the fourth analog output)
-            mx590LED = UnitConvertingDevice('Amber LED 590nm', 'V','manufacturer','Mightex').bindStream(daq.getStream('ao3'));
+            mx590LED = UnitConvertingDevice('mx590LED', 'V','manufacturer','Mightex').bindStream(daq.getStream('ao3'));
             
             %Configuration settings like this mean nothing for the actual
             %LED; they're only used to keep records of what you use (but

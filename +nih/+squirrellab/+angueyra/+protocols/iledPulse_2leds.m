@@ -3,9 +3,9 @@ classdef iledPulse_2leds < nih.squirrellab.shared.protocols.SquirrelLabProtocol
 	% Not using electrophysiology amplififer
     % Collects frame timing and temperature
     properties
-        preTime = 1000                    % Pulse leading duration (ms)
+        preTime = 100                    % Pulse leading duration (ms)
         stimTime = 1000                  % Pulse duration (ms)
-        tailTime = 3000                  % Pulse trailing duration (ms)
+        tailTime = 1000                  % Pulse trailing duration (ms)
         frame                           % imaging frame monitor
     end
 	
@@ -44,7 +44,7 @@ classdef iledPulse_2leds < nih.squirrellab.shared.protocols.SquirrelLabProtocol
         end
         
         function p = getPreview(obj, panel)
-            p = symphonyui.builtin.previews.StimuliPreview(panel, @()obj.createLedStimulus());
+            p = symphonyui.builtin.previews.StimuliPreview(panel, @()obj.createLedStimulus(1));
         end
         
         function prepareRun(obj)
@@ -91,9 +91,9 @@ classdef iledPulse_2leds < nih.squirrellab.shared.protocols.SquirrelLabProtocol
         function device = determineDevice(obj, epochNum)
             idx = mod(epochNum - 1, 2) + 1;
             if idx == 1
-                device = obj.led1;
+                device = obj.rig.getDevice(obj.led1);
             elseif idx == 2
-                device = obj.led2;
+                device = obj.rig.getDevice(obj.led2);
             end
         end
 		
