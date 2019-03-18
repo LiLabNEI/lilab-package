@@ -6,7 +6,7 @@ classdef Galvo2pPlusLightcrafter < nih.squirrellab.shared.rigs.Galvo2p
 %
 %     Note that the Rieke lab lightcrafter device embeds a stage.client
 %     instance that is used by Symphony, so there is no need to again add
-%     Stage as a device here (I found this out the hard way).
+%     Stage as a device here.
 %     
 %     Last modified 9-27-2018
     

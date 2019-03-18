@@ -25,3 +25,8 @@ find . -name '*.m' -print0 | xargs -0 sed -i "" 's/%nih.squirrellab.shared.proto
 
 
 find . -name '*.m' -print0 | xargs -0 sed -i "" 's/TwoPhoton/Galvo2P/g'
+
+
+for d in /Users/angueyraaristjm/matlab/lilab-package/+nih/+squirrellab/+shared/+sources/*; do
+  find . -name '*.m' -print0 | xargs -0 sed -i "" 's/nih.nih.nih.nih.squirrellab.shared.shared.shared.shared./nih.squirrellab.shared./g'
+done

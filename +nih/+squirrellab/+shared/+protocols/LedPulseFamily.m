@@ -1,4 +1,4 @@
-classdef LedPulseFamily < nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef ledPulseFamily < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     
     properties
         led                             % Output LED

@@ -1,4 +1,4 @@
-classdef LedNoiseFamily < nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef ledNoiseFamily < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     % Presents families of gaussian noise stimuli to a specified LED and records responses from a specified amplifier.
     % Each family consists of a set of noise stimuli with the standard deviation of noise starting at startStdv. Each
     % standard deviation value is repeated repeatsPerStdv times before moving to the next standard deviation value which

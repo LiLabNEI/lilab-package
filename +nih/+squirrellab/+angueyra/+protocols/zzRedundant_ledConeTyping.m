@@ -1,4 +1,4 @@
-classdef LedConeTyping < nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef ledConeTyping < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     
      properties
         preTime = 100                   % Pulse leading duration (ms)

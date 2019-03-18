@@ -1,4 +1,4 @@
-classdef ulcdSpot < nih.squirrellab.shared.protocols.SquirrelLabProtocol 
+classdef uLCDSpot < nih.squirrellab.shared.protocols.SquirrelLabProtocol 
     
     properties
         amp                             % Output amplifier
@@ -44,9 +44,7 @@ classdef ulcdSpot < nih.squirrellab.shared.protocols.SquirrelLabProtocol
         end
         
         function p = createPresentation(obj)
-%             device = obj.rig.getDevice('Stage');
-% %             canvasSize = device.getCanvasSize();
-%             uLCD = obj.rig.getDevice('uLCD');
+
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
             p.setBackgroundColor(0);
             

@@ -1,0 +1,4 @@
+% March 18, 2019
+	Rig descriptions - probably should update rig descriptions to all pull from a "NoAmp" parent and add amplifiers as needed
+	Protocols - then amplifiers could just be optional (like Amp2), so that anything could be run without them
+	Figures - would be cool if all or most plotting could be controlled by checkboxes in a module and optionnaly were in a single window

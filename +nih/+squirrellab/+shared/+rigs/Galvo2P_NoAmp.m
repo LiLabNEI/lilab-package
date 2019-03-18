@@ -4,7 +4,7 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
 %     configuration:
 %     
 %     Digital acquisition board: Heka ITC-18
-%     Amplifier:  A single Axopatch 200B 
+%     Amplifier:  NONE
 %     Mightex UV LED (405 nm)
 %     Mightex Amber LED (509 nm)
 %     Bioptechs temperature controller temp monitor
@@ -16,9 +16,6 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
 %             UV LED control voltage --> analog output 2
 %             Amber LED control voltage --> analog output 3
 %             
-%             scaled output --> analog input 0
-%             gain telegraph --> analog input 1
-%             voltage/current clamp mode --> analog input 3
 %             temperature monitor --> analog input 7
 %             
 %             frame monitor --> digital input 0 pin 0
@@ -29,10 +26,9 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
 %     Each LED has an Imax configuration for 350, 500, or 1000 mA that
 %     should correspond to front dip pin states of 00, 10, and 11, respectively.
 %
-%     This rig configuration has been modified by John Ball from Juan Angueyra's
-%     rig configuration file.
+%     This rig configuration is a duplication of Galvo2P, but just omits initializing the amplifier
 %     
-%     Last modified 9-26-2018
+%     Last modified 03-18-2019 (Angueyra)
     
     
     
@@ -41,9 +37,6 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
         
         function obj = Galvo2p()
             
-            %These lines put us on a first-name basis with the object
-            %definitions found in these package folders (rather than having
-            %to type out the whole path each time)
             import symphonyui.builtin.daqs.*;
             import symphonyui.builtin.devices.*;
             import symphonyui.core.*;
@@ -52,47 +45,15 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
             %Adds Heka ITC-18 as DAQ card.
             daq = HekaDaqController();  %defined in symphonyui.builtin.daqs
             obj.daqController = daq;
-            
-            
-            
-            %ITC ports are numbered from zero, not 1. So, ao0 = First Analog Output, ai2 = Third Analog Input, etc.
-            
-            %Adds Axopatch 200B to rig and then binds analog output 0
-            %(i.e., ao0) to the amplifier object we create
-            amp1 = AxopatchDevice('Amp1').bindStream(daq.getStream('ao0'));  %defined in symphonyui.builtin.devices
-            
-            %Tells Symphony to bind the ITC18 analog input 0 to the scaled output as
-            %defined in the AxopatchDevice object file
-            amp1.bindStream(daq.getStream('ai0'), AxopatchDevice.SCALED_OUTPUT_STREAM_NAME);
-            
-            %Same thing, but now tell symphony to associate ITC18 analog
-            %input 1 with the gain telegraph from the amplifier
-            amp1.bindStream(daq.getStream('ai1'), AxopatchDevice.GAIN_TELEGRAPH_STREAM_NAME);
-            
-            %missing frequency input here (is that the low pass filter value?)
-            
-            %Now look for the amplifier mode to be telegraphed over analog
-            %input 3
-            amp1.bindStream(daq.getStream('ai3'), AxopatchDevice.MODE_TELEGRAPH_STREAM_NAME);
-            obj.addDevice(amp1);
-            
-            %If possible it might be best to add configuration settings to
-            %the amp to cover the other settings that don't get
-            %telegraphed from the amplifier itself
-            
-            %This initializes a digital input called "frame monitor" that
-            %is associated with the first channel on the digital input
-            %port. Useful to monitor frame flips for the visual stimulus
+             
+            %Initializes a digital input to monitor imaging frame flips
             frame = UnitConvertingDevice('FrameMonitor', symphonyui.core.Measurement.UNITLESS).bindStream(daq.getStream('diport0'));
             daq.getStream('diport0').setBitPosition(frame, 0);
             obj.addDevice(frame);
 
-            
             %Initializing the UV LED on analog output 2 (the third analog output)
             mx405LED = UnitConvertingDevice('UV LED 405nm', 'V','manufacturer','Mightex').bindStream(daq.getStream('ao2'));
             
-            
-
             %Configuration settings like this mean nothing for the actual
             %LED; they're only used to keep records of what you use (but
             %you have to select the configuration settings yourself during the
@@ -128,9 +89,7 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
                 'type', PropertyType('cellstr', 'row', {'none', 'dichroicBriggman'}));
 
             
-            
-            
-            %This adds a device on analog input 7 that is intended to read
+            %Adds a device on analog input 7 that is intended to read
             %the temperature of the dish from the Bioptechs temperature
             %controller. This is sampled at same rate as ampflifiers, but Juan's
 			% protocols average over each epoch and replace the data witha single measurement

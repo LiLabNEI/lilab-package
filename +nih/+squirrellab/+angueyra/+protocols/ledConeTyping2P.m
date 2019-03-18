@@ -1,4 +1,7 @@
 classdef ledConeTyping2P < nih.squirrellab.shared.protocols.SquirrelLabProtocol
+
+% Protocol delivers alternating pulses with both LEDs in different epochs. 
+% Useful to quickly assess spectral sensitivity if amplitudes are known that give equal isomarization rates.
     
      properties
         preTime = 100                   % Pulse leading duration (ms)
@@ -74,7 +77,7 @@ classdef ledConeTyping2P < nih.squirrellab.shared.protocols.SquirrelLabProtocol
                 'NextPlot', 'add');
             
             
-            % plot three lines of zero
+            % plot two lines of zero
             totPts = obj.getTotalPts();
             timePts = (1:totPts) / obj.sampleRate;
             obj.plotData.lines = cell(1,2);

@@ -1,4 +1,4 @@
-classdef LedSine < nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef ledSine < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     % Presents a set of sinusoindal stimuli to a specified LED and records from a specified amplifier.
 	% LED is turned off after the set of epochs is completed.
 	

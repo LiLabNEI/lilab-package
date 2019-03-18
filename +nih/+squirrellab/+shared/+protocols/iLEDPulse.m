@@ -7,7 +7,7 @@ classdef iLEDPulse< nih.squirrellab.shared.protocols.SquirrelLabProtocol
         preTime = 1000                    % Pulse leading duration (ms)
         stimTime = 1000                  % Pulse duration (ms)
         tailTime = 3000                  % Pulse trailing duration (ms)
-        lightAmplitude = 5              % Pulse amplitude (V)
+        lightAmplitude = .5              % Pulse amplitude (V)
         lightMean = 0                   % Pulse and LED background mean (V)
         frame                           % imaging frame monitor
         numberOfAverages = uint16(1)    % Number of epochs
@@ -72,9 +72,9 @@ classdef iLEDPulse< nih.squirrellab.shared.protocols.SquirrelLabProtocol
             prepareEpoch@nih.squirrellab.shared.protocols.SquirrelLabProtocol(obj, epoch);
             
             % generate trigger
-            trigger = obj.rig.getDevices('Trigger');
-            if ~isempty(trigger)            
-                epoch.addStimulus(trigger{1}, obj.createTriggerStimulus());
+            sciscanTrigger = obj.rig.getDevices('sciscanTrigger');
+            if ~isempty(sciscanTrigger)            
+                epoch.addStimulus(sciscanTrigger{1}, obj.createTriggerStimulus());
             end
             
             epoch.addStimulus(obj.rig.getDevice(obj.led), obj.createLedStimulus());

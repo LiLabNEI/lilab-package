@@ -67,9 +67,6 @@ classdef uLCDhcfLED < nih.squirrellab.shared.protocols.SquirrelLabProtocol
         
         
         function p = createPresentation(obj)
-%             device = obj.rig.getDevice('Stage');
-% %             canvasSize = device.getCanvasSize();
-%             uLCD = obj.rig.getDevice('uLCD');
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
             p.setBackgroundColor(0);
             
