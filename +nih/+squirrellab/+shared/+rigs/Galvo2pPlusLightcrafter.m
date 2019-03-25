@@ -18,7 +18,7 @@ classdef Galvo2pPlusLightcrafter < nih.squirrellab.shared.rigs.Galvo2p
             
             %MICRONSPERPIXEL will be wrong!! don't pay attention to it for
             %now.
-            lightCrafter = nih.squirrellab.shared.devices.RiekeLightCrafterDevice('micronsPerPixel', 0.97);
+            lightCrafter = nih.squirrellab.shared.devices.UVAmberLightCrafterDevice('micronsPerPixel', 0.97);
             obj.addDevice(lightCrafter);            
             
             %As of now I haven't added any of the digital IO triggering
