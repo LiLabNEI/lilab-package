@@ -7,7 +7,7 @@ done
 
 
 
-sed -i 's/original/new/g' file.txt
+
 
 
 sed -i "" 's/squirrellab./nih.squirrellab.shared./g' *.txt
