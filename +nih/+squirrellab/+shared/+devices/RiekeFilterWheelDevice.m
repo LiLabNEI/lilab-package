@@ -24,8 +24,8 @@ classdef RiekeFilterWheelDevice < symphonyui.core.Device
             obj@symphonyui.core.Device(cobj);
             obj.cobj.MeasurementConversionTarget = symphonyui.core.Measurement.UNITLESS;
             
-            obj.addConfigurationSetting('NDF', '4.0', ...
-                'type', symphonyui.core.PropertyType('char', 'row', {'0.0','0.5','1.0','2.0','3.0','4.0'}));
+            obj.addConfigurationSetting('NDF', 4.0, ...
+                'type', symphonyui.core.PropertyType('denserealdouble', 'row', {0.0, 0.5, 1.0, 2.0, 3.0, 4.0}));
 
             % Try to connect.
             obj.connect(ip.Results.comPort);

@@ -3,13 +3,13 @@ classdef SingleSpotLcrControl < nih.squirrellab.shared.protocols.UvLCRStageProto
     properties
         amp                             % Output amplifier
         preTime = 250                   % Spot leading duration (ms)
-        stimTime = 4500                 % Spot duration (ms)
+        stimTime = 1500                 % Spot duration (ms)
         tailTime = 250                  % Spot trailing duration (ms)
         spotIntensity = 1.0             % Spot light intensity (0-1)
         spotDiameter = 300              % Spot diameter size (pixels)
         backgroundIntensity = 0.0       % Background light intensity (0-1)
         
-        numberOfAverages = uint16(5)    % Number of epochs
+        numberOfAverages = uint16(1)    % Number of epochs
         interpulseInterval = 0          % Duration between spots (s)
     end
     
@@ -17,8 +17,7 @@ classdef SingleSpotLcrControl < nih.squirrellab.shared.protocols.UvLCRStageProto
     properties (Hidden)
         ampType
     end
-    
-    
+
     methods
         
         function didSetRig(obj)
@@ -45,7 +44,7 @@ classdef SingleSpotLcrControl < nih.squirrellab.shared.protocols.UvLCRStageProto
             spot.color = obj.spotIntensity;
             spot.radiusX = obj.spotDiameter/2;
             spot.radiusY = obj.spotDiameter/2;
-            spot.position = canvasSize/2 - obj.centerOffset;
+            spot.position = canvasSize/2;% + obj.centerOffset;
             p.addStimulus(spot);
             
 
@@ -56,9 +55,13 @@ classdef SingleSpotLcrControl < nih.squirrellab.shared.protocols.UvLCRStageProto
             spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', @(state)toggleVis(state));
             p.addController(spotVisible);
             
+            p = addFrameTracker(obj, p);
+            
         end
         
-        
+        function p = addFrameTracker(obj, p) 
+            p = addFrameTracker@nih.squirrellab.shared.protocols.UvLCRStageProtocol(obj, p, obj.preTime, obj.preTime + obj.stimTime);
+        end
         
         function prepareEpoch(obj, epoch)
             prepareEpoch@nih.squirrellab.shared.protocols.UvLCRStageProtocol(obj, epoch);
