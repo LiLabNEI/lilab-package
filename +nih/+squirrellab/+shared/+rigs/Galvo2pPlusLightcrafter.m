@@ -16,9 +16,10 @@ classdef Galvo2pPlusLightcrafter < nih.squirrellab.shared.rigs.Galvo2p
         function obj = Galvo2pPlusLightcrafter()
             
             
-            %MICRONSPERPIXEL will be wrong!! don't pay attention to it for
-            %now.
-            lightCrafter = nih.squirrellab.shared.devices.RiekeLightCrafterDevice('micronsPerPixel', 0.97);
+            %MICRONSPERPIXEL and centerOffset calibrated on 4-5-2019 by JB
+            %I plan to include a calibration protocol later.
+            lightCrafter = nih.squirrellab.shared.devices.UVAmberLightCrafterDevice('micronsPerPixel', 0.3125);
+            lightCrafter.setCenterOffset([0, 0])
             obj.addDevice(lightCrafter);            
             
             %As of now I haven't added any of the digital IO triggering

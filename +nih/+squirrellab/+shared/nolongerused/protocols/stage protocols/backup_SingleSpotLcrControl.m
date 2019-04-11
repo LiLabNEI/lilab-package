@@ -1,4 +1,4 @@
-classdef SingleSpotLcrControl < io.github.stage_vss.protocols.StageProtocol
+classdef backup_SingleSpotLcrControl < io.github.stage_vss.protocols.StageProtocol
     
     properties
         amp                             % Output amplifier

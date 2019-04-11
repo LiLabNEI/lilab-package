@@ -1,22 +1,20 @@
-classdef SingleSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
+classdef CalibrationSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
     
     properties
         amp                             % Output amplifier
         preTime = 250                   % Spot leading duration (ms)
         stimTime = 1500                 % Spot duration (ms)
         tailTime = 250                  % Spot trailing duration (ms)
-        spotIntensity = 1.0             % Spot light intensity (0-1)
-        spotDiameter = 300              % Spot diameter size (pixels)
+        
+        spotDiameter = 250              % Spot diameter size (pixels)
         backgroundIntensity = 0.0       % Background light intensity (0-1)
         spotCenter = [0, 0]             % Center of spot (pixels)
-        
-        numberOfAverages = uint16(1)    % Number of epochs
-        interpulseInterval = 0          % Duration between spots (s)
     end
     
     
     properties (Hidden)
         ampType
+        statusFigure
     end
 
     methods
@@ -31,6 +29,8 @@ classdef SingleSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
         
         function prepareRun(obj)
             prepareRun@nih.squirrellab.shared.protocols.UvLCRStageProtocol(obj);
+            
+            %Generously steal from prepareRun@sealTest here
             
         end
         

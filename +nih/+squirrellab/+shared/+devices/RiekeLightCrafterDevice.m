@@ -3,6 +3,8 @@ classdef RiekeLightCrafterDevice < symphonyui.core.Device
     %Shamelessly stolen from Rieke-Lab github: https://github.com/Rieke-Lab/riekelab-package/blob/master/src/main/matlab/%2Bedu/%2Bwashington/%2Briekelab/%2Bdevices/LightCrafterDevice.m
     %on 9-10-2018 by JB
     
+    % setImageOrientation function added by JB 4-4-2019
+    
     properties (Access = private, Transient)
         stageClient
         lightCrafter
@@ -79,7 +81,6 @@ classdef RiekeLightCrafterDevice < symphonyui.core.Device
             if ~isempty(obj.lightCrafter)
                 obj.lightCrafter.delete();
 %                 obj.lightCrafter.disconnect();
-%                 disp('getting here 3');
             end
         end
         
@@ -130,13 +131,14 @@ classdef RiekeLightCrafterDevice < symphonyui.core.Device
             background.color = presentation.backgroundColor;
             presentation.setBackgroundColor(0);
             presentation.insertStimulus(1, background);
+        
+
+
             
-            %While this will ultimately be useful I have commented it
-            %out for now to make basic display/alignment easier
-            
+            % New tracker geometry calibrated to our tracking lightpath JB 4-4-2019
 %             tracker = stage.builtin.stimuli.Rectangle();
-%             tracker.size = [canvasSize(1) * 1/8, canvasSize(2)];
-%             tracker.position = [canvasSize(1) - (canvasSize(1)/16), canvasSize(2)/2] - centerOffset;
+%             tracker.size = [200, canvasSize(2)];
+%             tracker.position = [canvasSize(1)/2.0 + 800, canvasSize(2)/2] - centerOffset;
 %             presentation.addStimulus(tracker);
 %             
 %             trackerColor = stage.builtin.controllers.PropertyController(tracker, 'color', @(s)mod(s.frame, 2) && double(s.time + (1/s.frameRate) < presentation.duration));
@@ -194,6 +196,13 @@ classdef RiekeLightCrafterDevice < symphonyui.core.Device
         function [auto, red, green, blue] = getLedEnables(obj)
             [auto, red, green, blue] = obj.lightCrafter.getLedEnables();
         end
+        
+        % Added by JB on 4-4-2019 to expose LCR image flip options to
+        % symphony. The two arguments passed are booleans
+        function setImageOrientation(obj, northSouthFlipped, eastWestFlipped)
+            obj.lightCrafter.setImageOrientation(northSouthFlipped, eastWestFlipped)
+        end
+        
         
         function r = availablePatternRates(obj)
             r = obj.patternRatesToAttributes.keys;

@@ -1,4 +1,4 @@
-classdef SingleSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
+classdef SingleSpotLcrControl < nih.squirrellab.shared.protocols.UvLCRStageProtocol
     
     properties
         amp                             % Output amplifier
@@ -8,7 +8,6 @@ classdef SingleSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
         spotIntensity = 1.0             % Spot light intensity (0-1)
         spotDiameter = 300              % Spot diameter size (pixels)
         backgroundIntensity = 0.0       % Background light intensity (0-1)
-        spotCenter = [0, 0]             % Center of spot (pixels)
         
         numberOfAverages = uint16(1)    % Number of epochs
         interpulseInterval = 0          % Duration between spots (s)
@@ -34,27 +33,6 @@ classdef SingleSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
             
         end
         
-        
-        function d = getPropertyDescriptor(obj, name)
-            d = getPropertyDescriptor@nih.squirrellab.shared.protocols.UvLCRStageProtocol(obj, name);        
-            
-
-            % Can also set d.displayName, d.description
-            if contains(lower(name), 'spot') || contains(lower(name), 'background')
-                d.category = 'Pattern stimulus';
-                
-                if contains(lower(name), 'diameter') || contains(lower(name), 'center')
-                    d.displayName = [d.displayName ' (pixels)'];
-                elseif contains(lower(name), 'intensity')
-                    d.displayName = [d.displayName ' [0-1]'];
-                end
-
-                %No default behavior; is handled in superclass
-            end
-
-        end 
-        
-        
         function p = createPresentation(obj)
             
             canvasSize = obj.rig.getDevice('Stage').getCanvasSize();
@@ -66,7 +44,7 @@ classdef SingleSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
             spot.color = obj.spotIntensity;
             spot.radiusX = obj.spotDiameter/2;
             spot.radiusY = obj.spotDiameter/2;
-            spot.position = canvasSize/2 + obj.spotCenter;
+            spot.position = canvasSize/2;% + obj.centerOffset;
             p.addStimulus(spot);
             
 
@@ -81,13 +59,9 @@ classdef SingleSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
             
         end
         
-        
-        
         function p = addFrameTracker(obj, p) 
             p = addFrameTracker@nih.squirrellab.shared.protocols.UvLCRStageProtocol(obj, p, obj.preTime, obj.preTime + obj.stimTime);
         end
-        
-        
         
         function prepareEpoch(obj, epoch)
             prepareEpoch@nih.squirrellab.shared.protocols.UvLCRStageProtocol(obj, epoch);
