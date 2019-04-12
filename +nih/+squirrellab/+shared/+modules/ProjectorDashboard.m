@@ -19,6 +19,7 @@ classdef ProjectorDashboard < symphonyui.ui.Module
         ledCurrentSliders
         patternRatePopupMenu
         centerOffsetFields
+        umPerPixField
         prerenderCheckbox
         listenerHandles
         ledCurrents = struct('amber', 30, 'uv', 50, 'blue', 50);
@@ -78,6 +79,13 @@ classdef ProjectorDashboard < symphonyui.ui.Module
             Label( ...
                 'Parent', lightCrafterLayout, ...
                 'String', 'Center offset (um):','backgroundcolor','w');
+            
+            %TODO: Add "resolution" label here
+            Label( ...
+                'Parent', lightCrafterLayout, ...
+                'String', 'Pixel size:','backgroundcolor','w');
+            
+            
             %Grid element 4
             Label( ...
                 'Parent', lightCrafterLayout, ...
@@ -284,13 +292,14 @@ classdef ProjectorDashboard < symphonyui.ui.Module
 
 
             %Grid element 7
+            
             offsetLayout = uix.HBox( ...
                 'Parent', lightCrafterLayout, ...
                 'Spacing', 5, 'backgroundcolor','w');
             obj.centerOffsetFields.x = uicontrol( ...
                 'Parent', offsetLayout, ...
                 'Style', 'edit', ...
-                'HorizontalAlignment', 'left', ...
+                'HorizontalAlignment', 'center', ...
                 'Callback', @obj.onSetCenterOffset);
             Label( ...
                 'Parent', offsetLayout, ...
@@ -298,14 +307,28 @@ classdef ProjectorDashboard < symphonyui.ui.Module
             obj.centerOffsetFields.y = uicontrol( ...
                 'Parent', offsetLayout, ...
                 'Style', 'edit', ...
-                'HorizontalAlignment', 'left', ...
+                'HorizontalAlignment', 'center', ...
                 'Callback', @obj.onSetCenterOffset);
             Label( ...
                 'Parent', offsetLayout, ...
                 'String', 'Y','backgroundcolor','w');
             set(offsetLayout, ...
                 'Widths', [-1 8+5 -1 8]);
-
+            
+            %TODO: Add um/px HBox w/textbox & label here
+            umPerPixLayout = uix.HBox( ...
+                'Parent', lightCrafterLayout, ...
+                'Spacing', 5, 'backgroundcolor','w');
+            obj.umPerPixField = uicontrol( ...
+                'Parent', umPerPixLayout, ...
+                'Style', 'edit', ...
+                'HorizontalAlignment', 'center', ...
+                'Callback', @obj.onSetPixelSize);
+            Label( ...
+                'Parent', umPerPixLayout, ...
+                'String', 'microns/pixel','backgroundcolor','w');
+            
+            
             %Grid element 8
             obj.prerenderCheckbox = uicontrol( ...
                 'Parent', lightCrafterLayout, ...
@@ -315,7 +338,7 @@ classdef ProjectorDashboard < symphonyui.ui.Module
 
             set(lightCrafterLayout, ...
                 'Widths', [100 -1], ...
-                'Heights', [23 120 23 23 23]);
+                'Heights', [23 120 23 23 23 23]);
 
 
 
@@ -415,6 +438,7 @@ classdef ProjectorDashboard < symphonyui.ui.Module
             obj.populateLedEnables();
             obj.populatePatternRateList();
             obj.populateCenterOffset();
+            obj.populatePixelSize();
             obj.populatePrerender();
             
             
@@ -521,7 +545,6 @@ classdef ProjectorDashboard < symphonyui.ui.Module
             set(obj.ledCurrentEditboxes.blue,'foregroundcolor','k')
             
             obj.lightCrafter.setLedCurrents(obj.ledCurrents.amber, obj.ledCurrents.uv, obj.ledCurrents.blue);
-%             disp(['currents set: ' num2str(obj.ledCurrents.amber) ' ' num2str(obj.ledCurrents.uv) ' ' num2str(obj.ledCurrents.blue)]);
         end
         
         function toggleLed(obj, ~, ~)
@@ -612,6 +635,11 @@ classdef ProjectorDashboard < symphonyui.ui.Module
             set(obj.centerOffsetFields.y, 'String', num2str(offset(2)));
         end
         
+        function populatePixelSize(obj)
+            umPerPix = obj.lightCrafter.pix2um(1);
+            set(obj.umPerPixField, 'String', num2str(umPerPix));
+        end
+        
         function onSetCenterOffset(obj, ~, ~)
             x = str2double(get(obj.centerOffsetFields.x, 'String'));
             y = str2double(get(obj.centerOffsetFields.y, 'String'));
@@ -620,6 +648,16 @@ classdef ProjectorDashboard < symphonyui.ui.Module
                 return;
             end
             obj.lightCrafter.setCenterOffset(obj.lightCrafter.um2pix([x, y]));
+        end
+        
+        function onSetPixelSize(obj, ~, ~)
+            umPerPix = str2double(get(obj.umPerPixField, 'String'));
+            if isnan(umPerPix)
+                obj.view.showError('Could not parse value to a valid scalar.');
+                return;
+            end
+            obj.lightCrafter.setMicronsPerPixel(umPerPix);
+            obj.populateCenterOffset();
         end
         
         function populatePrerender(obj)

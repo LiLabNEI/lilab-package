@@ -14,7 +14,17 @@ classdef UVAmberLightCrafterDevice < nih.squirrellab.shared.devices.RiekeLightCr
            
             %To correct for image inversion by the microscope optics
             obj.setImageOrientation(true,true);
+            
+            
+            obj.addResource('ledOrder', {'560nm', '400nm', '460nm'});
+            obj.addConfigurationSetting('lightCrafterLedCurrents',  [0, 0, 0], 'isReadOnly', true);
+            
+            obj.setLedCurrents(0,0,0);
         end
+        
+        
+        
+        
         
         
         function setLedCurrents(obj, amber, UV, blue)
@@ -28,9 +38,7 @@ classdef UVAmberLightCrafterDevice < nih.squirrellab.shared.devices.RiekeLightCr
         
         
         function setImageOrientation(obj, a, b)
-           
             setImageOrientation@nih.squirrellab.shared.devices.RiekeLightCrafterDevice(obj, a, b);
-            
         end
     end
     

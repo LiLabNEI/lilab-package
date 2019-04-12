@@ -105,6 +105,10 @@ classdef RiekeLightCrafterDevice < symphonyui.core.Device
             obj.setReadOnlyConfigurationSetting('centerOffset', [o(1) o(2)]);
         end
         
+        function setMicronsPerPixel(obj, newValue)
+            obj.setReadOnlyConfigurationSetting('micronsPerPixel', newValue);
+        end
+        
         function o = getCenterOffset(obj)
             o = obj.getConfigurationSetting('centerOffset');
         end
@@ -182,8 +186,8 @@ classdef RiekeLightCrafterDevice < symphonyui.core.Device
         
         function setLedCurrents(obj, red, green, blue)
             obj.lightCrafter.setLedCurrents( red, green, blue);
-%             [a, r, g, b] = obj.lightCrafter.getLedEnables();
-%             obj.setReadOnlyConfigurationSetting('lightCrafterLedEnables', [a, r, g, b]);
+            [r, g, b] = obj.lightCrafter.getLedCurrents();
+            obj.setReadOnlyConfigurationSetting('lightCrafterLedCurrents', [r, g, b]);
         end
         
         function setLedEnables(obj, auto, red, green, blue)

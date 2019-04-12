@@ -17,13 +17,18 @@ classdef Galvo2pPlusLightcrafter < nih.squirrellab.shared.rigs.Galvo2p
             
             
             %MICRONSPERPIXEL and centerOffset calibrated on 4-5-2019 by JB
-            %I plan to include a calibration protocol later.
             lightCrafter = nih.squirrellab.shared.devices.UVAmberLightCrafterDevice('micronsPerPixel', 0.3125);
             lightCrafter.setCenterOffset([0, 0])
+            
+            %Like with the filterWheel in the Galvo2p rig description, binding
+            %the LCR so that its configuration properties are written to
+            %each epoch
+            daq = obj.daqController;
+            lightCrafter.bindStream(daq.getStream('doport1'));
+            daq.getStream('doport1').setBitPosition(lightCrafter, 15);
+            
             obj.addDevice(lightCrafter);            
             
-            %As of now I haven't added any of the digital IO triggering
-            %implemented by the Rieke lab
             
         end
         

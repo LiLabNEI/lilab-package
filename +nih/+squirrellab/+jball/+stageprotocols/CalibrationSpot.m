@@ -3,15 +3,20 @@ classdef CalibrationSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
     properties
         amp                             % Output amplifier
         
-        spotDiameter = 250              % Spot diameter size (pixels)
-        backgroundIntensity = 0.0       % Background light intensity (0-1)
-        spotCenter = [0, 0]             % Center of spot (pixels)
+        spotDiameter = uint16(250)              % Spot diameter size (pixels)
+        
+        spotCenterX = int16(0)             % Horizontal center of spot (pixels)
+        spotCenterY = int16(0)             % Vertical center of spot (pixels)
     end
     
     
     properties (Hidden)
         ampType
         statusFigure
+        backgroundIntensity = 0.0       % Background light intensity (0-1)
+        spotDiameterType = symphonyui.core.PropertyType('uint16', 'scalar', [0 1000])
+        spotCenterXType = symphonyui.core.PropertyType('int16', 'scalar', [-100 100])
+        spotCenterYType = symphonyui.core.PropertyType('int16', 'scalar', [-100 100])
     end
 
     methods
@@ -19,15 +24,18 @@ classdef CalibrationSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
         function didSetRig(obj)
             didSetRig@nih.squirrellab.shared.protocols.UvLCRStageProtocol(obj);
 
-            
+            devices = obj.rig.getDevices('LightCrafter');
+            if isempty(devices)
+                error('No LightCrafter device found');
+            end
+            lightCrafter = devices{1};
+            obj.spotDiameter = uint16(lightCrafter.um2pix(100.0));
         end
         
 
         
         function prepareRun(obj)
             prepareRun@nih.squirrellab.shared.protocols.UvLCRStageProtocol(obj);
-            
-            %Generously steal from prepareRun@SealTest here
             
         end
         
@@ -37,13 +45,19 @@ classdef CalibrationSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
             
 
             % Can also set d.displayName, d.description
-            if contains(lower(name), 'spot') || contains(lower(name), 'background')
-                d.category = 'Pattern stimulus';
+            if strcmp(d.category, 'Amplifier')
+               d.isHidden = true; 
+            end
+            
+            if contains(lower(name), 'spot')
+                d.category = 'Spot size & location in LCR pixels';
                 
-                if contains(lower(name), 'diameter') || contains(lower(name), 'center')
+                if contains(lower(name), 'diameter')
                     d.displayName = [d.displayName ' (pixels)'];
-                elseif contains(lower(name), 'intensity')
-                    d.displayName = [d.displayName ' [0-1]'];
+                elseif strcmp(name, 'spotCenterX')
+                    d.displayName = ['Additional X offset'];
+                elseif strcmp(name, 'spotCenterY')
+                    d.displayName = ['Additional Y offset'];
                 end
 
                 %No default behavior; is handled in superclass
@@ -61,45 +75,10 @@ classdef CalibrationSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
             
             spot = stage.builtin.stimuli.Ellipse();
             spot.color = 1;
-            spot.radiusX = obj.spotDiameter/2;
-            spot.radiusY = obj.spotDiameter/2;
-            spot.position = canvasSize/2 + obj.spotCenter;
-            p.addStimulus(spot);
-            
-
-%             function v = toggleVis(state)
-%                 v = state.time >= obj.preTime * 1e-3 && state.time < (obj.preTime + obj.stimTime) * 1e-3 ;
-%             end
-            
-            
-%             function p = spotPosition(state)
-% 			
-%                 p = obj.spotCenter;
-% 			
-%                 if window.getKeyState(GLFW.GLFW_KEY_UP)
-%                     p(2) = p(2) + 1;
-%                 end
-%                 if window.getKeyState(GLFW.GLFW_KEY_DOWN)
-%                     p(2) = p(2) - 1;
-%                 end
-%                 if window.getKeyState(GLFW.GLFW_KEY_LEFT)
-%                     p(1) = p(1) - 1;
-%                 end
-%                 if window.getKeyState(GLFW.GLFW_KEY_RIGHT)
-%                     p(1) = p(1) + 1;
-%                 end
-%                 
-%                 obj.spotCenter = p;
-%             end
-            
-            
-            
-%             spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', @(state)toggleVis(state));
-%             p.addController(spotVisible);
-            
-%             spotMove = stage.builtin.controllers.PropertyController(spot, 'position', @(state)spotPosition(state));
-%             p.addController(spotMove);
-            
+            spot.radiusX = double(obj.spotDiameter)/2.0;
+            spot.radiusY = double(obj.spotDiameter)/2.0;
+            spot.position = canvasSize/2 + double([obj.spotCenterX obj.spotCenterY]);
+            p.addStimulus(spot);            
         end
 
         
@@ -109,13 +88,27 @@ classdef CalibrationSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
             
             device = obj.rig.getDevice(obj.amp);
             
-            duration = 1.0;
+            duration = 0.250;
+            
+            devices = obj.rig.getDevices('LightCrafter');
+            if isempty(devices)
+                error('No LightCrafter device found');
+            end
+            lightCrafter = devices{1};
+            
+            previousOffset = lightCrafter.getCenterOffset();
+            
+            tempMicronsPerPixel = 100.0/double(obj.spotDiameter);
+            tempCenterX = tempMicronsPerPixel * (double(obj.spotCenterX) + previousOffset(1));
+            tempCenterY = tempMicronsPerPixel * (double(obj.spotCenterY) + previousOffset(2));
+            
+            clc
+            fprintf('Current calibration: Center offset (um): X = %3.4f, Y = %3.4f, um/px = %3.4f\n', tempCenterX, tempCenterY, tempMicronsPerPixel);
+            
             epoch.addDirectCurrentStimulus(device, device.background, duration, obj.sampleRate);
             epoch.addResponse(device);
         end
-        
-        
-        
+
         
         function prepareInterval(obj, interval)
             prepareInterval@nih.squirrellab.shared.protocols.UvLCRStageProtocol(obj, interval);
@@ -133,12 +126,12 @@ classdef CalibrationSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
         function tf = shouldContinueRun(obj)
             tf = obj.numEpochsCompleted < 1;
         end
-       
-        function completeRun(obj)
-           
-            disp('completeRun was called.');
-            
-        end
+%        
+%         function completeRun(obj)
+%            
+%             disp('completeRun was called.');
+%             
+%         end
         
     end
     

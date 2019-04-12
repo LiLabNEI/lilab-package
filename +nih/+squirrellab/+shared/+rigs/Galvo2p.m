@@ -148,13 +148,11 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
             
             %Filter wheel device & related module adapted from the
             %Rieke Lab package on github. (https://github.com/Rieke-Lab/riekelab-package)
-            %Adds the thorlab filter wheel device to this system (currently COM1)
+            %Adds the thorlab filter wheel device to this system (currently COM11)
             filterWheel = nih.squirrellab.shared.devices.RiekeFilterWheelDevice('comPort', 'COM11');
             
             
             %Per original file: Binding the filter wheel to an unused stream only so its configuration settings are written to each epoch.
-			%As with temperature controller, data from filterWheel will be sampled at same rate as amplifiers.
-			%Protocols could be set up to foollow temperature controller and replace data with single measurement for each epoch (but not set up yet).
             daq = obj.daqController;
             filterWheel.bindStream(daq.getStream('doport1'));
             daq.getStream('doport1').setBitPosition(filterWheel, 15);
