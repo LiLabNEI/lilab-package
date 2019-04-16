@@ -134,7 +134,6 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
                 epoch.addStimulus(sciscanTrigger{1}, obj.createTriggerStimulus());
             end
             
-            epoch.addStimulus(obj.rig.getDevice(obj.led), obj.createLedStimulus());
             epoch.addResponse(obj.rig.getDevice(obj.frame));
             
             % Should I also allow the setting of LED Enables here?

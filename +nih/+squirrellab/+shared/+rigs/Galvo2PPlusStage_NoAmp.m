@@ -1,4 +1,4 @@
-classdef Galvo2PPlusStage_NoAmp < nih.squirrellab.shared.rigs.Galvo2p_NoAmp
+classdef Galvo2pPlusStage_NoAmp < nih.squirrellab.shared.rigs.Galvo2p_NoAmp
     
 %     Galvo2PPlusStage_NoAmp - This rig description is identical to Galvo2p_NoAmp, but
 %     includes an instance of Stage as a device to talk to another instance

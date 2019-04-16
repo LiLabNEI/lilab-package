@@ -1,4 +1,4 @@
-classdef Galvo2PPlusLightcrafter_NoAmp < nih.squirrellab.shared.rigs.Galvo2P_NoAmp
+classdef Galvo2pPlusLightcrafter_NoAmp < nih.squirrellab.shared.rigs.Galvo2p_NoAmp
     
 %     Galvo2pPlusStage - This rig description is identical to Galvo2P_NoAmp, but
 %     includes a lightcrafter projector object so that communication with Stage can
@@ -13,7 +13,7 @@ classdef Galvo2PPlusLightcrafter_NoAmp < nih.squirrellab.shared.rigs.Galvo2P_NoA
     
     methods
         
-        function obj = Galvo2PPlusLightcrafter_NoAmp()
+        function obj = Galvo2pPlusLightcrafter_NoAmp()
             
             %MICRONSPERPIXEL and centerOffset calibrated on 4-5-2019 by JB
             lightCrafter = nih.squirrellab.shared.devices.UVAmberLightCrafterDevice('micronsPerPixel', 0.3125);

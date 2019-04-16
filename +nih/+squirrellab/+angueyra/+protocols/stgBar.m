@@ -1,10 +1,9 @@
 classdef stgBar < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp
     
     properties
-        preTime = 01000                 % Bar leading duration (ms)
-        stimTime = 05000                % Bar duration (ms)
-        tailTime = 01000                % Bar trailing duration (ms)
-        barSpeed = 02000                % Bar speed (pix/s)
+        preTime = 100                   % Bar leading duration (ms)
+        stimTime = 500                % Bar duration (ms)
+        tailTime = 100                % Bar trailing duration (ms)
         barIntensity = 1.0              % Bar light intensity (0-1)
         backgroundIntensity = 0.0       % Background light intensity (0-1)
         
@@ -98,9 +97,6 @@ classdef stgBar < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp
         
         function prepareInterval(obj, interval)
             prepareInterval@nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp(obj, interval);
-            
-            device = obj.rig.getDevice(obj.amp);
-            interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);
         end
         
         function tf = shouldContinuePreparingEpochs(obj)

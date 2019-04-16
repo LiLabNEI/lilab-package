@@ -20,6 +20,7 @@ classdef stgMovingBar < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
     end
     
     properties (Hidden)
+        barOrientationRad
     end
     
     methods
@@ -40,7 +41,7 @@ classdef stgMovingBar < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
         
         function prepareRun(obj)
             prepareRun@nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp(obj);
-            
+
         end
         
         function d = getPropertyDescriptor(obj, name)
@@ -64,6 +65,7 @@ classdef stgMovingBar < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
         
         function p = createPresentation(obj)
             canvasSize = obj.rig.getDevice('Stage').getCanvasSize();
+            obj.barOrientationRad = obj.barOrientation/180*pi;
             
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
             p.setBackgroundColor(obj.backgroundIntensity);
@@ -88,15 +90,15 @@ classdef stgMovingBar < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
             % Bar position controller
             function h = motionTable(obj, time)
                 % Calculate the increment with time.  
-                inc = time * obj.barSpeed - 570 - obj.barWidth;
+                inc = time * obj.barSpeed - 500 - obj.barWidth;
                 
-                h = [cos(obj.orientationRads) sin(obj.orientationRads)] .* (inc*ones(1,2)) + obj.canvasSize/2 + [obj.barHorizontalPosition obj.barVerticalPosition];
+                h = [cos(obj.barOrientationRad) sin(obj.barOrientationRad)] .* (inc*ones(1,2)) + canvasSize/2 + [obj.barHorizontalPosition obj.barVerticalPosition];
             end
             
 %             barPositionController = stage.builtin.controllers.PropertyController(rect, 'position', ...
 %                 @(state)motionTable(obj, state.time - (obj.preTime+obj.waitTime)*1e-3));
-            
-            barPositionController = stage.builtin.controllers.PropertyController(rect, 'position', ...
+%             
+            barPositionController = stage.builtin.controllers.PropertyController(bar, 'position', ...
                 @(state)motionTable(obj, state.time - (obj.preTime)*1e-3));
             p.addController(barPositionController);
             
@@ -115,10 +117,7 @@ classdef stgMovingBar < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp(obj, interval);
-            
-            device = obj.rig.getDevice(obj.amp);
-            interval.addDirectCurrentStimulus(device, device.background, obj.interpulseInterval, obj.sampleRate);
+            prepareInterval@nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp(obj, interval);            
         end
         
         function tf = shouldContinuePreparingEpochs(obj)
