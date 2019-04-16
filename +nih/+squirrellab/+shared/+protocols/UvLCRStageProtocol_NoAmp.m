@@ -1,4 +1,9 @@
-classdef UvLCRStageProtocol < io.github.stage_vss.protocols.StageProtocol
+classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
+% Protocol designed for imaging experiments without electrophysiology
+% where stimulation includes the EKB-modified lightcrafter
+% Will add frame tracker by default with a figure display
+% Will also add a trigger meant to start imaging acquisition synchronized to start of first epoch
+% Created April 2019 (Angueyra)
     
     properties
 %         amberLedIntensity = uint8(30);      % Intensity of amber LCR LED
@@ -10,6 +15,8 @@ classdef UvLCRStageProtocol < io.github.stage_vss.protocols.StageProtocol
     properties (Hidden)
         lcr                                 % EKB Lightcrafter device
         lcrType
+        frame                               % Frame monitor (requires turning on PFi4 output in SciScan)
+        frameType
         
 %         amberLedIntensityType = symphonyui.core.PropertyType('uint8', 'scalar', [0 30]);
 %         uvLedIntensityType = symphonyui.core.PropertyType('uint8', 'scalar', [0 255]);
@@ -21,8 +28,8 @@ classdef UvLCRStageProtocol < io.github.stage_vss.protocols.StageProtocol
         function didSetRig(obj)
             didSetRig@io.github.stage_vss.protocols.StageProtocol(obj);
             
-            [obj.amp, obj.ampType] = obj.createDeviceNamesProperty('Amp');
             [obj.lcr, obj.lcrType] = obj.createDeviceNamesProperty('LightCrafter');
+            [obj.frame, obj.frameType] = obj.createDeviceNamesProperty('FrameMonitor');
             
             
 %             devices = obj.rig.getDevices('LightCrafter');
@@ -75,9 +82,25 @@ classdef UvLCRStageProtocol < io.github.stage_vss.protocols.StageProtocol
         function prepareRun(obj)
             prepareRun@io.github.stage_vss.protocols.StageProtocol(obj);
             
+            obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.frame));
+            
 %             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.amp));
 %             obj.showFigure('symphonyui.builtin.figures.MeanResponseFigure', obj.rig.getDevice(obj.amp));
 %             obj.showFigure('io.github.stage_vss.figures.FrameTimingFigure', obj.rig.getDevice('Stage'));
+        end
+        
+        function stim = createTriggerStimulus(obj)
+            gen = symphonyui.builtin.stimuli.PulseGenerator();
+            
+            gen.preTime = 0;
+            gen.stimTime = 1;
+            gen.tailTime = obj.preTime + obj.stimTime + obj.tailTime - 1;
+            gen.amplitude = 1;
+            gen.mean = 0;
+            gen.sampleRate = obj.sampleRate;
+            gen.units = symphonyui.core.Measurement.UNITLESS;
+            
+            stim = gen.generate();
         end
 
         function p = blankFinalFrame(obj, p) %#ok<INUSL>
@@ -104,6 +127,15 @@ classdef UvLCRStageProtocol < io.github.stage_vss.protocols.StageProtocol
         
         function prepareEpoch(obj, epoch)
             prepareEpoch@io.github.stage_vss.protocols.StageProtocol(obj, epoch);
+            
+            % generate trigger
+            sciscanTrigger = obj.rig.getDevices('sciscanTrigger');
+            if ~isempty(sciscanTrigger)            
+                epoch.addStimulus(sciscanTrigger{1}, obj.createTriggerStimulus());
+            end
+            
+            epoch.addStimulus(obj.rig.getDevice(obj.led), obj.createLedStimulus());
+            epoch.addResponse(obj.rig.getDevice(obj.frame));
             
             % Should I also allow the setting of LED Enables here?
             

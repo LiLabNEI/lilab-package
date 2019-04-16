@@ -1,4 +1,4 @@
-classdef ulcdHCF < nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef uLCDhcf < nih.squirrellab.shared.protocols.SquirrelLabProtocol
     
     properties
         amp                             % Output amplifier
