@@ -1,7 +1,7 @@
 classdef stgSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp
     
     properties
-        preTime = 250                   % Spot leading duration (ms)
+        preTime = 100                   % Spot leading duration (ms)
         stimTime = 1500                 % Spot duration (ms)
         tailTime = 250                  % Spot trailing duration (ms)
         spotIntensity = 1.0             % Spot light intensity (0-1)

@@ -1,4 +1,4 @@
-classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol %& nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
 % Protocol designed for imaging experiments without electrophysiology
 % where stimulation includes the EKB-modified lightcrafter
 % Will add frame tracker by default with a figure display
@@ -17,6 +17,8 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol 
         lcrType
         frame                               % Frame monitor (requires turning on PFi4 output in SciScan)
         frameType
+        lcrFrameTracker                     % lcr frame tracking (requires photodiode and enabling frameTracker)
+        lcrFrameTrackerType
         
 %         amberLedIntensityType = symphonyui.core.PropertyType('uint8', 'scalar', [0 30]);
 %         uvLedIntensityType = symphonyui.core.PropertyType('uint8', 'scalar', [0 255]);
@@ -30,7 +32,7 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol 
             
             [obj.lcr, obj.lcrType] = obj.createDeviceNamesProperty('LightCrafter');
             [obj.frame, obj.frameType] = obj.createDeviceNamesProperty('FrameMonitor');
-            
+            [obj.lcrFrameTracker, obj.lcrFrameTrackerType] = obj.createDeviceNamesProperty('lcrFrameTracker');
             
 %             devices = obj.rig.getDevices('LightCrafter');
 %             if isempty(devices)
@@ -82,8 +84,8 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol 
         function prepareRun(obj)
             prepareRun@io.github.stage_vss.protocols.StageProtocol(obj);
             
-            obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.frame));
-            obj.showFigure('io.github.stage_vss.figures.FrameTimingFigure', obj.rig.getDevice('Stage'));
+%             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.frame));
+            obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.lcrFrameTracker));
         end
         
         function stim = createTriggerStimulus(obj)
@@ -125,6 +127,12 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol 
         function prepareEpoch(obj, epoch)
             prepareEpoch@io.github.stage_vss.protocols.StageProtocol(obj, epoch);
             
+            % add temperature controller monitor
+            T5Controller = obj.rig.getDevices('T5Controller');
+            if ~isempty(T5Controller)
+                epoch.addResponse(T5Controller{1});
+            end
+            
             % generate trigger
             sciscanTrigger = obj.rig.getDevices('sciscanTrigger');
             if ~isempty(sciscanTrigger)            
@@ -132,13 +140,34 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol 
             end
             
             epoch.addResponse(obj.rig.getDevice(obj.frame));
+            epoch.addResponse(obj.rig.getDevice(obj.lcrFrameTracker));
             
             % Should I also allow the setting of LED Enables here?
             
             % Set led currents from properties panel
 %             lcrDev = obj.rig.getDevice(obj.lcr);
 %             lcrDev.setLedCurrents(obj.amberLedIntensity, obj.uvLedIntensity, obj.blueLedIntensity);
-
+        end
+        
+        function completeEpoch(obj, epoch)
+            completeEpoch@io.github.stage_vss.protocols.StageProtocol(obj, epoch);
+            
+            %condense temperature measurement into single value
+            T5Controller = obj.rig.getDevices('T5Controller');
+            if ~isempty(T5Controller) && epoch.hasResponse(T5Controller{1})
+                response = epoch.getResponse(T5Controller{1});
+                [quantities, units] = response.getData();
+                if ~strcmp(units, 'V')
+                    error('T5 Temperature Controller must be in volts');
+                end
+                
+                % Temperature readout from Bioptechs Delta T4/T5 Culture dish controllers is 100 mV/degree C.
+                temperature = mean(quantities) * 1000 * (1/100);
+                temperature = round(temperature * 10) / 10;
+                epoch.addParameter('dishTemperature', temperature);
+                fprintf('Temp = %2.2g C\n', temperature)
+                epoch.removeResponse(T5Controller{1});
+            end
         end
         
         function prepareInterval(obj, interval)

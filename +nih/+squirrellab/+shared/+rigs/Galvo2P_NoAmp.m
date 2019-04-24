@@ -45,8 +45,12 @@ classdef Galvo2p_NoAmp < symphonyui.core.descriptions.RigDescription
             %Adds Heka ITC-18 as DAQ card.
             daq = HekaDaqController();  %defined in symphonyui.builtin.daqs
             obj.daqController = daq;
-             
-            %Initializes a digital input to monitor imaging frame flips
+            
+            %Initializes an analog input to monitor LCR frame flips (measured by photodiode)
+            lcrFrameTracker = UnitConvertingDevice('lcrFrameTracker', 'V').bindStream(daq.getStream('ai6'));
+            obj.addDevice(lcrFrameTracker);
+            
+            %Initializes a digital input to monitor imaging frame flips(output from sciScan)
             frame = UnitConvertingDevice('FrameMonitor', symphonyui.core.Measurement.UNITLESS).bindStream(daq.getStream('diport0'));
             daq.getStream('diport0').setBitPosition(frame, 0);
             obj.addDevice(frame);
