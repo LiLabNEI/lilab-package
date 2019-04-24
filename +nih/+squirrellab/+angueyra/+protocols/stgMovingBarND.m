@@ -1,14 +1,15 @@
 classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp
     
     properties
-        preTime = 01000                 % Bar leading duration (ms)
-        tailTime = 01000                % Bar trailing duration (ms)
-        barSpeed = 01000                % Bar speed (pix/s)
+        preTime = 250                 % Bar leading duration (ms)
+        tailTime = 250                % Bar trailing duration (ms)
+        
+        barSpeed = 500                % Bar speed (pix/s)
         barIntensity = 1.0              % Bar light intensity (0-1)
         backgroundIntensity = 0.0       % Background light intensity (0-1)
         
-        barWidth = 100                  % bar width (pix)
-        barHeight = 100                 % bar height (pix)
+        barWidth = 50                  % bar width (pix)
+        barHeight = 350                 % bar height (pix)
         barNDirections = 8              % Bar number of directions
         barStartDirection = 0           % Bar starting direction (degrees)
         
@@ -62,10 +63,14 @@ classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_No
             if contains(lower(name), 'bar') || contains(lower(name), 'background')
                 d.category = 'Pattern stimulus';
                 
-                if contains(lower(name), 'width') || contains(lower(name), 'position')
+                if contains(lower(name), 'width') || contains(lower(name), 'position') || contains(lower(name), 'height')
                     d.displayName = [d.displayName ' (pixels)'];
                 elseif contains(lower(name), 'intensity')
                     d.displayName = [d.displayName ' [0-1]'];
+                elseif contains(lower(name), 'start')
+                    d.displayName = [d.displayName ' (degrees)'];
+                elseif contains(lower(name), 'speed')
+                    d.displayName = [d.displayName ' (pixels/s)'];
                 end
 
                 %No default behavior; is handled in superclass
@@ -79,7 +84,6 @@ classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_No
             obj.barDirections = (0:360/obj.barNDirections:359)+obj.barStartDirection;
             obj.barDirections = mod(obj.barDirections,360);
             obj.barDirectionsRad = obj.barDirections/180*pi;
-            disp(obj.barDirectionsRad)
 
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
             p.setBackgroundColor(obj.backgroundIntensity);
@@ -92,8 +96,13 @@ classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_No
             p.addStimulus(bar);
             
             function v = toggleVis(state)
+%                 v = 0;
+%                 if state.time >= obj.preTime * 1e-3 && state.time <= 2.5%(obj.preTime + obj.stimTime) * 1e-3
+%                     v=1;
+%                 end
                 v = state.time >= obj.preTime * 1e-3 && state.time < (obj.preTime + obj.stimTime) * 1e-3 ;
             end
+
             
             barVisible = stage.builtin.controllers.PropertyController(bar, 'visible', @(state)toggleVis(state));
             p.addController(barVisible);

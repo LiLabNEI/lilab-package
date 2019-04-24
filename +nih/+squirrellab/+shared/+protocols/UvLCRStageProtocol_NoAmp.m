@@ -1,4 +1,4 @@
-classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
+classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol & nih.squirrellab.shared.protocols.SquirrelLabProtocol
 % Protocol designed for imaging experiments without electrophysiology
 % where stimulation includes the EKB-modified lightcrafter
 % Will add frame tracker by default with a figure display
@@ -83,10 +83,7 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
             prepareRun@io.github.stage_vss.protocols.StageProtocol(obj);
             
             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.frame));
-            
-%             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.amp));
-%             obj.showFigure('symphonyui.builtin.figures.MeanResponseFigure', obj.rig.getDevice(obj.amp));
-%             obj.showFigure('io.github.stage_vss.figures.FrameTimingFigure', obj.rig.getDevice('Stage'));
+            obj.showFigure('io.github.stage_vss.figures.FrameTimingFigure', obj.rig.getDevice('Stage'));
         end
         
         function stim = createTriggerStimulus(obj)
@@ -145,8 +142,7 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
         end
         
         function prepareInterval(obj, interval)
-            prepareInterval@io.github.stage_vss.protocols.StageProtocol(obj, interval);
-            
+            prepareInterval@io.github.stage_vss.protocols.StageProtocol(obj, interval); 
         end
         
         function tf = shouldContinuePreparingEpochs(obj)
