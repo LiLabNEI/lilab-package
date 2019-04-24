@@ -1,4 +1,4 @@
-classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol & nih.squirrellab.shared.protocols.SquirrelLabProtocol
+classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol %& nih.squirrellab.shared.protocols.SquirrelLabProtocol
 % Protocol designed for imaging experiments without electrophysiology
 % where stimulation includes the EKB-modified lightcrafter
 % Will add frame tracker by default with a figure display
