@@ -20,7 +20,7 @@ classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_No
     end
     
     properties (Hidden)
-        stimTime                % Bar duration (ms) ->  should be calculated based on speed and assuming bar moves 1000 um
+        stimTime
         stimTime_oneBar
         barDirections
         barDirectionsRad
@@ -30,8 +30,15 @@ classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_No
         
         function didSetRig(obj)
             didSetRig@nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp(obj);
-            
+            obj.setStimTime();
         end
+        
+        function setStimTime(obj)
+            obj.stimTime_oneBar = 2000;
+            obj.stimTime = obj.stimTime_oneBar * obj.barNDirections; % need to dynamically calculate this
+            % will depend on speed, bar width, starting position
+        end
+         
         
         function p = getPreview(obj, panel)
             if isempty(obj.rig.getDevices('Stage'))
@@ -43,8 +50,8 @@ classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_No
         end
         
         function prepareRun(obj)
+            obj.setStimTime();
             prepareRun@nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp(obj);
-
         end
         
         function d = getPropertyDescriptor(obj, name)
@@ -71,13 +78,9 @@ classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_No
             
             obj.barDirections = (0:360/obj.barNDirections:359)+obj.barStartDirection;
             obj.barDirections = mod(obj.barDirections,360);
-            obj.barDirectionRad = obj.barDirections/180*pi;
-            
-%             disp(obj.barDirections)
-            obj.stimTime_oneBar = 2000;
-            obj.stimTime = obj.stimTime_oneBar * obj.barNDirections; % need to dynamically calculate this
-            % will depend on speed, bar width, starting position
-            
+            obj.barDirectionsRad = obj.barDirections/180*pi;
+            disp(obj.barDirectionsRad)
+
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
             p.setBackgroundColor(obj.backgroundIntensity);
             
@@ -88,26 +91,44 @@ classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_No
             bar.position = canvasSize/2.0 + [obj.barHorizontalPosition obj.barVerticalPosition];
             p.addStimulus(bar);
             
-%             function v = toggleVis(state)
-%                 v = state.time >= obj.preTime * 1e-3 && state.time < (obj.preTime + obj.stimTime) * 1e-3 ;
-%             end
-%             
-%             barVisible = stage.builtin.controllers.PropertyController(bar, 'visible', @(state)toggleVis(state));
-%             p.addController(barVisible);
+            function v = toggleVis(state)
+                v = state.time >= obj.preTime * 1e-3 && state.time < (obj.preTime + obj.stimTime) * 1e-3 ;
+            end
             
+            barVisible = stage.builtin.controllers.PropertyController(bar, 'visible', @(state)toggleVis(state));
+            p.addController(barVisible);
             
-            % Bar position and orientation controller
-%             function h = motionTable(obj, time)
-%                 % Calculate the increment with time.  
-%                 inc = mod(time,obj.stimTime_oneBar) * obj.barSpeed - 500 - obj.barWidth; %reset increments at every bar switch
-%                 barN = ceil(time/obj.stimTime_oneBar);
-%                 h = [cos(obj.barDirectionRad(barN)) sin(obj.barDirectionRad(barN))] .* (inc*ones(1,2)) + canvasSize/2 + [obj.barHorizontalPosition obj.barVerticalPosition];
-%             end
-                   
-%             barPositionController = stage.builtin.controllers.PropertyController(bar, 'position', ...
-%                 @(state)motionTable(obj, state.time - (obj.preTime)*1e-3));
-%             p.addController(barPositionController);
+            % Bar orientation controller
+            function o = orientationTable(obj, time)
+                barN = ceil(time/(obj.stimTime_oneBar/1e3));
+                if barN == 0
+                    barN=1;
+                end
+                o = obj.barDirections(barN);
+            end            
+            barOrientationController = stage.builtin.controllers.PropertyController(bar, 'orientation', ...
+                @(state)orientationTable(obj, state.time - (obj.preTime)*1e-3));
+            p.addController(barOrientationController);
             
+%             % Bar position and orientation controller
+            function h = motionTable(obj, time)
+                % Calculate the increment with time.  
+                inc = mod(time,(obj.stimTime_oneBar/1e3)) * obj.barSpeed - 100 - obj.barWidth; %reset increments at every bar switch
+                barN = ceil(time/(obj.stimTime_oneBar/1e3));
+                if barN == 0
+                    barN=1;
+                end
+%                 h = [cos(obj.barDirectionsRad(barN)) sin(obj.barDirectionsRad(barN))] .* (inc*ones(1,2)) + canvasSize/2 + [obj.barHorizontalPosition obj.barVerticalPosition];
+                h = [cos(obj.barDirectionsRad(barN)) sin(obj.barDirectionsRad(barN))] .* (inc*ones(1,2)) + canvasSize/2 + [obj.barHorizontalPosition obj.barVerticalPosition];
+            end
+            
+            barPositionController = stage.builtin.controllers.PropertyController(bar, 'position', ...
+                @(state)motionTable(obj, state.time - (obj.preTime)*1e-3));
+            p.addController(barPositionController);
+            
+
+            
+
             
             p = addFrameTracker(obj, p);
             

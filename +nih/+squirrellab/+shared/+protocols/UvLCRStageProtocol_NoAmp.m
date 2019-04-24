@@ -48,7 +48,7 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
             
             % Can also set d.displayName, d.description
             if strncmp(name, 'numberOf',8) || any(strcmp(name, {'preTime','stimTime','tailTime','interpulseInterval'}))
-                d.category = 'Sweep Control';
+                d.category = 'Epoch Control';
                 
                 if contains(name, 'Time') || contains(name, 'Interval')
                     d.displayName = [d.displayName ' (ms)'];
