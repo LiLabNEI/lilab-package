@@ -1,4 +1,10 @@
 classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp
+    % Moving bar stimulus with concatenated directions.
+    % Created Apr_2019 (Angueyra)
+    % Modified May_2019 (Angueyra): added a 2s itnerval between directiosn
+    % by increasing barTotalTravel. Could produce some conflict with poech
+    % beeing too long
+    % Once analysis is settled, should make bar directions random and include non-moving flashing bars for comparison.
     
     properties
         preTime = 250                 % Bar leading duration (ms)
@@ -26,7 +32,7 @@ classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_No
         barDirections
         barDirectionsRad
         barStartPosition = -1000;
-        barTotalTravel = 2000;
+        barTotalTravel; %barTotalTravel = 2000;
     end
     
     methods
@@ -37,12 +43,13 @@ classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_No
         end
         
         function setStimTime(obj)
+            obj.barTotalTravel = 2000 + (obj.barSpeed * 2); % adding a 2s interval between bars by extending bar travel.
             obj.stimTime_oneBar = ceil((obj.barTotalTravel + obj.barWidth)/(obj.barSpeed/1e3));
             obj.stimTime = obj.stimTime_oneBar * obj.barNDirections;
-            fprintf('\npreTime = %d ms\n',obj.preTime);
-            fprintf('stimTime = %d ms\n',obj.stimTime);
-            fprintf('totalTime = %d ms\n',obj.preTime + obj.stimTime + obj.tailTime);
-            fprintf('stimTime_oneBar = %d ms\n',obj.stimTime_oneBar);
+            fprintf('-----\n');
+            fprintf('stimTime_oneBar = %3g s\n',obj.stimTime_oneBar*1e-3);
+            fprintf('stimTime = %3g s\n',obj.stimTime*1e-3);
+            fprintf('totalTime = %3g s\n',(obj.preTime + obj.stimTime + obj.tailTime)*1e-3);
             fprintf('-----\n');
             
             

@@ -84,7 +84,7 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
         function prepareRun(obj)
             prepareRun@io.github.stage_vss.protocols.StageProtocol(obj);
             
-%             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.frame));
+            obj.showFigure('nih.squirrellab.shared.figures.FrameMonitorFigure', obj.rig.getDevice(obj.frame));
             obj.showFigure('symphonyui.builtin.figures.ResponseFigure', obj.rig.getDevice(obj.lcrFrameTracker));
         end
         

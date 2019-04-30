@@ -3,9 +3,9 @@ classdef stgMovingBar < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
     % 00 deg = Left-Right
     % 90 deg = Up-Down
     properties
-        preTime = 01000                 % Bar leading duration (ms)
+        preTime = 00500                 % Bar leading duration (ms)
         stimTime = 02000                % Bar duration (ms)
-        tailTime = 01000                % Bar trailing duration (ms)
+        tailTime = 01500                % Bar trailing duration (ms)
         
         barSpeed = 02000                % Bar speed (pix/s)
         barIntensity = 1.0              % Bar light intensity (0-1)
