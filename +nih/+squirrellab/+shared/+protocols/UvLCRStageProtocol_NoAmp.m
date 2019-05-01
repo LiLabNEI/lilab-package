@@ -102,15 +102,16 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
             stim = gen.generate();
         end
 
-        function p = blankFinalFrame(obj, p) %#ok<INUSL>
-            background = stage.builtin.stimuli.Rectangle();
-            background.size = 2*[912 570];
-            background.position = [912 570];
-            background.color = presentation.backgroundColor;
-            p.setBackgroundColor(0);
-            p.insertStimulus(1, background);
-            p.addStimulus(background);
-        end
+        % JB: Function doesn't work. Don't use until fully implemented.
+%         function p = blankFinalFrame(obj, p) %#ok<INUSL>
+%             background = stage.builtin.stimuli.Rectangle();
+%             background.size = 2*[912 570];
+%             background.position = [912 570];
+%             background.color = presentation.backgroundColor;
+%             p.setBackgroundColor(0);
+%             p.insertStimulus(1, background);
+%             p.addStimulus(background);
+%         end
         
         function p = addFrameTracker(obj, p, startTime, stopTime) %#ok<INUSL>
             

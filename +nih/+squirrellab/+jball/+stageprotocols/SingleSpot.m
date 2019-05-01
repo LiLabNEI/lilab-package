@@ -77,7 +77,8 @@ classdef SingleSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
             spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', @(state)toggleVis(state));
             p.addController(spotVisible);
             
-            p = addFrameTracker(obj, p);
+            p = obj.addFrameTracker(p);
+            p = obj.addTrackerBarToFirstFrame(p);
             
         end
         
@@ -85,6 +86,10 @@ classdef SingleSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol
         
         function p = addFrameTracker(obj, p) 
             p = addFrameTracker@nih.squirrellab.shared.protocols.UvLCRStageProtocol(obj, p, obj.preTime, obj.preTime + obj.stimTime);
+        end
+        
+        function p = addTrackerBarToFirstFrame(obj, p) 
+            p = addTrackerBarToFirstFrame@nih.squirrellab.shared.protocols.UvLCRStageProtocol(obj, p);
         end
         
         

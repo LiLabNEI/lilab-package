@@ -32,7 +32,7 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
 %     This rig configuration has been modified by John Ball from Juan Angueyra's
 %     rig configuration file.
 %     
-%     Last modified 9-26-2018
+%     Last modified 5-1-2019
     
     
     
@@ -53,6 +53,11 @@ classdef Galvo2p < symphonyui.core.descriptions.RigDescription
             daq = HekaDaqController();  %defined in symphonyui.builtin.daqs
             obj.daqController = daq;
             
+            
+            %(Thanks Juan)
+            %Initializes an analog input to monitor LCR frame flips (measured by photodiode)
+            lcrFrameTracker = UnitConvertingDevice('lcrFrameTracker', 'V').bindStream(daq.getStream('ai6'));
+            obj.addDevice(lcrFrameTracker);
             
             
             %ITC ports are numbered from zero, not 1. So, ao0 = First Analog Output, ai2 = Third Analog Input, etc.
