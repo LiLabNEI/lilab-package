@@ -82,7 +82,8 @@ classdef stgBar < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp
             p.addController(barVisible);
              
             
-            p = addFrameTracker(obj, p);
+            p = obj.addFrameTracker(p);
+            p = obj.addTrackerBarToFirstFrame(p);
             
         end
         

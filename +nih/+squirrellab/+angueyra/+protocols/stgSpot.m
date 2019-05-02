@@ -72,7 +72,8 @@ classdef stgSpot < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAmp
             spotVisible = stage.builtin.controllers.PropertyController(spot, 'visible', @(state)toggleVis(state));
             p.addController(spotVisible);
             
-            p = addFrameTracker(obj, p);
+            p = obj.addFrameTracker(p);
+            p = obj.addTrackerBarToFirstFrame(p);
             
         end
         

@@ -12,7 +12,6 @@ classdef UvLCRStageProtocol < io.github.stage_vss.protocols.StageProtocol
         lcr                                 % EKB Lightcrafter device
         lcrType
         
-        %(Thanks Juan)
         lcrFrameTracker                     % lcr frame tracking (requires photodiode and enabling frameTracker)
         lcrFrameTrackerType
 %         amberLedIntensityType = symphonyui.core.PropertyType('uint8', 'scalar', [0 30]);
@@ -41,8 +40,6 @@ classdef UvLCRStageProtocol < io.github.stage_vss.protocols.StageProtocol
         function d = getPropertyDescriptor(obj, name)
             d = getPropertyDescriptor@symphonyui.core.Protocol(obj, name);        
             
-            
-            
             % Can also set d.displayName, d.description
             if strncmp(name, 'numberOf',8) || any(strcmp(name, {'preTime','stimTime','tailTime','interpulseInterval','waitForLcrTrigger'}))
                 d.category = 'Sweep Control';
@@ -60,6 +57,7 @@ classdef UvLCRStageProtocol < io.github.stage_vss.protocols.StageProtocol
                 
             elseif contains(name,'Led') || any(strcmp(name, {'centerOffset'}))
                 d.category = 'Projector Control';
+                
             else
                 d.category = 'Protocol Parameters';
             end
@@ -112,7 +110,6 @@ classdef UvLCRStageProtocol < io.github.stage_vss.protocols.StageProtocol
             trackerVis = stage.builtin.controllers.PropertyController(tracker, 'visible', @(s)(s.frame~=0));
             p.addController(trackerColor); 
             p.addController(trackerVis); 
-            
         end
         
         

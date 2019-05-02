@@ -10,14 +10,15 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
 %         uvLedIntensity = uint8(50);         % Intensity of UV LCR LED
 %         blueLedIntensity = uint8(50);       % Intensity of blue LCR LED
 %         centerOffset = [0, 0]               % Pattern [x, y] center offset (pixels)
+        waitForLcrTrigger = true
     end
     
     properties (Hidden)
         lcr                                 % EKB Lightcrafter device
         lcrType
-        frame                               % Frame monitor (requires turning on PFi4 output in SciScan)
+        frame                               % Imaging frame monitor (requires turning on PFi4 output in SciScan)
         frameType
-        lcrFrameTracker                     % lcr frame tracking (requires photodiode and enabling frameTracker)
+        lcrFrameTracker                     % LCR frame tracking (requires photodiode and enabling frameTracker)
         lcrFrameTrackerType
         
 %         amberLedIntensityType = symphonyui.core.PropertyType('uint8', 'scalar', [0 30]);
@@ -46,11 +47,9 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
         function d = getPropertyDescriptor(obj, name)
             d = getPropertyDescriptor@symphonyui.core.Protocol(obj, name);        
             
-            
-            
             % Can also set d.displayName, d.description
-            if strncmp(name, 'numberOf',8) || any(strcmp(name, {'preTime','stimTime','tailTime','interpulseInterval'}))
-                d.category = 'Epoch Control';
+            if strncmp(name, 'numberOf',8) || any(strcmp(name, {'preTime','stimTime','tailTime','interpulseInterval','waitForLcrTrigger'}))
+                d.category = 'Sweep Control';
                 
                 if contains(name, 'Time') || contains(name, 'Interval')
                     d.displayName = [d.displayName ' (ms)'];
@@ -65,6 +64,7 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
                 
             elseif contains(name,'Led') || any(strcmp(name, {'centerOffset'}))
                 d.category = 'Projector Control';
+                
             else
                 d.category = 'Protocol Parameters';
             end
@@ -102,16 +102,17 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
             stim = gen.generate();
         end
 
-        % JB: Function doesn't work. Don't use until fully implemented.
-%         function p = blankFinalFrame(obj, p) %#ok<INUSL>
-%             background = stage.builtin.stimuli.Rectangle();
-%             background.size = 2*[912 570];
-%             background.position = [912 570];
-%             background.color = presentation.backgroundColor;
-%             p.setBackgroundColor(0);
-%             p.insertStimulus(1, background);
-%             p.addStimulus(background);
-%         end
+        function p = addTrackerBarToFirstFrame(obj, p) %#ok<INUSL>
+            
+            trigger = stage.builtin.stimuli.Rectangle();
+            trigger.size = [200, 1140];
+            trigger.position = [912 + 850, 570];
+            trigger.color = 1;
+            p.addStimulus(trigger);
+            
+            triggerVis = stage.builtin.controllers.PropertyController(trigger, 'visible', @(s)(s.frame==0));
+            p.addController(triggerVis); 
+        end
         
         function p = addFrameTracker(obj, p, startTime, stopTime) %#ok<INUSL>
             
@@ -121,7 +122,9 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
             p.addStimulus(tracker);
             
             trackerColor = stage.builtin.controllers.PropertyController(tracker, 'color', @(s)mod(s.frame, 2) && double(s.time + (1/s.frameRate) < p.duration  &&  s.time >= startTime/1000.0  &&  s.time < stopTime/1000.0));
+            trackerVis = stage.builtin.controllers.PropertyController(tracker, 'visible', @(s)(s.frame~=0));
             p.addController(trackerColor); 
+            p.addController(trackerVis); 
         end
         
         
@@ -134,17 +137,21 @@ classdef UvLCRStageProtocol_NoAmp < io.github.stage_vss.protocols.StageProtocol
                 epoch.addResponse(T5Controller{1});
             end
             
-            % generate trigger
+            % generate trigger for imaging software
             sciscanTrigger = obj.rig.getDevices('sciscanTrigger');
             if ~isempty(sciscanTrigger)            
                 epoch.addStimulus(sciscanTrigger{1}, obj.createTriggerStimulus());
             end
+
+            % uses the frame tracker and arduino circuit that derives input from photodiode 
+            % to trigger acquisition in ITC-18 once StageVSS presentation has begun. 
+            % Improves temporal alignment
+            epoch.shouldWaitForTrigger = obj.waitForLcrTrigger;
             
             epoch.addResponse(obj.rig.getDevice(obj.frame));
             epoch.addResponse(obj.rig.getDevice(obj.lcrFrameTracker));
             
             % Should I also allow the setting of LED Enables here?
-            
             % Set led currents from properties panel
 %             lcrDev = obj.rig.getDevice(obj.lcr);
 %             lcrDev.setLedCurrents(obj.amberLedIntensity, obj.uvLedIntensity, obj.blueLedIntensity);

@@ -105,7 +105,8 @@ classdef stgMovingBar < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
             p.addController(barPositionController);
             
             
-            p = addFrameTracker(obj, p);
+            p = obj.addFrameTracker(p);
+            p = obj.addTrackerBarToFirstFrame(p);
             
         end
         

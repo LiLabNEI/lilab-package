@@ -157,7 +157,8 @@ classdef stgMovingBarND < nih.squirrellab.shared.protocols.UvLCRStageProtocol_No
                 @(state)motionTable(obj, state.time));
             p.addController(barPositionController);
             
-            p = addFrameTracker(obj, p);
+            p = obj.addFrameTracker(p);
+            p = obj.addTrackerBarToFirstFrame(p);
             
         end
         
