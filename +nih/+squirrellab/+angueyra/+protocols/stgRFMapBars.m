@@ -99,8 +99,8 @@ classdef stgRFMapBars < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
         function p = createPresentation(obj)
             canvasSize = obj.rig.getDevice('Stage').getCanvasSize();
 
-			obj.barPositions = ([0:1:obj.barN]*obj.barWidth) - floor(obj.barSpan/2);
-            obj.barOrientations = ([0:180/obj.barNOrientation:179])+obj.barStartOrientation;
+			obj.barPositions = ((1:1:obj.barN)*obj.barWidth) - floor(obj.barSpan/2);
+            obj.barOrientations = (0:180/obj.barNOrientation:179)+obj.barStartOrientation;
             obj.barOrientations = mod(obj.barOrientations,180);
             obj.barOrientationsRad = obj.barOrientations/180*pi;
             
@@ -116,24 +116,7 @@ classdef stgRFMapBars < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
             bar.position = canvasSize/2.0 + [obj.barHorizontalPosition obj.barVerticalPosition];
             p.addStimulus(bar);
             
-            % Bar position controller 
-			% (order of operations here? does orientation controller operate after position controller? -> yes? go to moving bars stim)
-            function h = positionTable(obj, time)
-                barNumber = 1;
-                barOrientation = obj.barOrientations(barNumber);
-                if time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3
-                    barNumber = ceil( (time - (obj.preTime*1e-3)) / (obj.stimTime_oneBar * 1e-3) );
-                    barNumber = mod(barNumber-1, obj.barNOrientation)+1;
-                    barOrientation = obj.barOrientations( ceil(barNumber/obj.barNOrientation) );
-                end
-                h = [cos(barOrientation) sin(barOrientation)] .* [obj.barPositions(barNumber),0] + canvasSize/2 + [obj.barHorizontalPosition obj.barVerticalPosition];
-            end
             
-            barPositionController = stage.builtin.controllers.PropertyController(bar, 'position', ...
-                @(state)positionTable(obj, state.time));
-            p.addController(barPositionController);
-			
-
             % Bar visibility controller
             function v = toggleVis(obj, time)
                 v = 0;
@@ -148,19 +131,38 @@ classdef stgRFMapBars < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
             end
             barVisible = stage.builtin.controllers.PropertyController(bar, 'visible', @(state)toggleVis(obj,state.time));
             p.addController(barVisible);
-			
             
-            % Bar orientation controller
-            function o = orientationTable(obj, time)
-                barNumber = 1;
+            % Bar position controller (only operates on center, so need to consider orientation too)
+            function p = togglePosition(obj, time)
+                time = time + 1/60e3; %shifting by one frame to avoid switch during presentation of bar
+                p = [0,0];
                 if time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3
                     barNumber = ceil( (time - (obj.preTime*1e-3)) / (obj.stimTime_oneBar * 1e-3) );
-                    barNumber = ceil(barNumber/obj.barNOrientation);
+                    barNumber = mod(barNumber-1, obj.barN)+1;
+                    barOrientationRad = obj.barOrientationsRad( ceil(barNumber/obj.barNOrientation) );
+                    p = [cos(barOrientationRad),sin(barOrientationRad)] .* [obj.barPositions(barNumber),obj.barPositions(barNumber)] + canvasSize/2 + [obj.barHorizontalPosition obj.barVerticalPosition];
                 end
-                o = obj.barOrientations(barNumber);
+                
+            end
+            
+            barPositionController = stage.builtin.controllers.PropertyController(bar, 'position', ...
+                @(state)togglePosition(obj, state.time));
+            p.addController(barPositionController);
+            
+            % Bar orientation controller
+            function o = toggleOrientation(obj, time)
+                time = time + 1/60e3; %shifting by one frame to avoid switch during presentation of bar
+                o = 0;
+                if time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3
+                    oNumber = ceil( (time - (obj.preTime*1e-3)) / (obj.stimTime_oneBar * 1e-3 * obj.barN) );
+                    %         barNumber = mod(barNumber-1, obj.barN)+1;
+                    %         oNumber = ceil(oNumber/obj.barNOrientation);
+                    
+                    o = obj.barOrientations(oNumber);
+                end
             end
             barOrientationController = stage.builtin.controllers.PropertyController(bar, 'orientation', ...
-                @(state)orientationTable(obj, state.time));
+                @(state)toggleOrientation(obj, state.time));
             p.addController(barOrientationController);
             
             
