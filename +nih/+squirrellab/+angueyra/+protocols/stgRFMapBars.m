@@ -114,84 +114,49 @@ classdef stgRFMapBars < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
             bar.orientation = obj.barOrientations(1);
             bar.position = canvasSize/2.0 + [obj.barHorizontalPosition obj.barVerticalPosition];
             p.addStimulus(bar);
-            % THERE ARE PROBLEMS FOR NOT CONSIDERING BAR NUMBER AND BAR
-            % ORIENTATION NUMBER. mAKE DEBUGGER FOR THIS. sOMETHING THAT
-            % TAKES A TIME VECTOR AND SPITS TABLE
+            
             % Bar position controller 
 			% (order of operations here? does orientation controller operate after position controller? -> yes? go to moving bars stim)
-%             function h = positionTable(obj, time)
-%                 if time <= obj.preTime * 1e-3
-%                     barN = 1;
-%                 elseif time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3                    
-%                     barN = ceil( (time - (obj.preTime*1e-3)) / (obj.stimTime_oneBar * 1e-3) );
-%                 else
-%                     barN=1; %obj.barNDirections;
-%                 end
-% 				h = obj.barPositions(barN);
-%             end
-%             
-%             barPositionController = stage.builtin.controllers.PropertyController(bar, 'position', ...
-%                 @(state)positionTable(obj, state.time));
-%             p.addController(barPositionController);
-% 			
-% 			
+            function h = positionTable(obj, time)
+                barNumber = 1;
+                if time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3
+                    barNumber = ceil( (time - (obj.preTime*1e-3)) / (obj.stimTime_oneBar * 1e-3) );
+                    barNumber = mod(barNumber-1, obj.barNOrientation)+1;
+                end
+                h = obj.barPositions(barNumber);
+            end
+            
+            barPositionController = stage.builtin.controllers.PropertyController(bar, 'position', ...
+                @(state)positionTable(obj, state.time));
+            p.addController(barPositionController);
+			
+			
             % Bar orientation controller
             function o = orientationTable(obj, time)
-                if time <= obj.preTime * 1e-3
-                    barNumber = 1;
-                elseif time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3                    
+                barNumber = 1;
+                if time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3
                     barNumber = ceil( (time - (obj.preTime*1e-3)) / (obj.stimTime_oneBar * 1e-3) );
-                else
-                    barNumber=1;
+                    barNumber = ceil(barNumber/obj.barNOrientation);
                 end
                 o = obj.barOrientations(barNumber);
-            end            
+            end
             barOrientationController = stage.builtin.controllers.PropertyController(bar, 'orientation', ...
                 @(state)orientationTable(obj, state.time));
             p.addController(barOrientationController);
            
 
-%             % Bar visibility controller
-%             function v = toggleVis(obj, time)
-%                 % long version
-%                 if time <= obj.preTime * 1e-3
-%                     v = 0;
-%                 elseif time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3
-%                     barIntrinsicTime = mod(time - (obj.preTime*1e-3),(obj.stimTime_oneBar/1e3));
-%                     if barIntrinsicTime < obj.stimTime_oneBar
-%                         v = 1;
-%                     else
-%                         v = 0;
-%                     end
-%                 elseif time >= (obj.preTime + obj.stimTime) * 1e-3
-%                     v = 0;
-%                 else
-%                     v = 0;
-%                 end
-% % 				%shorter version
-% % 				v = 0;
-% % 				if time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3                    
-% % 					barIntrinsicTime = mod(time - (obj.preTime*1e-3),(obj.stimTime_oneBar/1e3));
-% %                     if barIntrinsicTime < obj.barStimTime * 1e-3 
-% % 						v = 1;
-% % 					end
-% % 				end
-%             end
-
-            
-%             function v = toggleVis(obj, time)
-%                 v = time >= obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3 ;
-%             end
-%             barVisible = stage.builtin.controllers.PropertyController(bar, 'visible', @(state)toggleVis(obj, state.time));
-%             p.addController(barVisible);
-            
-            
-%             function v = toggleVis(state)
-%                 v = state.time >= obj.preTime * 1e-3 && state.time < (obj.preTime + obj.stimTime) * 1e-3 ;
-%             end
-%             
-%             barVisible = stage.builtin.controllers.PropertyController(bar, 'visible', @(state)toggleVis(state));
-%             p.addController(barVisible);
+            % Bar visibility controller
+            function v = toggleVis(obj, time)
+                v = 0;
+                if time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3
+                    barIntrinsicTime = mod(time - (obj.preTime*1e-3),(obj.stimTime_oneBar/1e3));
+                    if barIntrinsicTime < obj.barStimTime * 1e-3
+                        v = 1;
+                    end
+                end
+            end
+            barVisible = stage.builtin.controllers.PropertyController(bar, 'visible', @(state)toggleVis(state));
+            p.addController(barVisible);
 			
             p = obj.addFrameTracker(p);
             % p = obj.addTrackerBarToFirstFrame(p);

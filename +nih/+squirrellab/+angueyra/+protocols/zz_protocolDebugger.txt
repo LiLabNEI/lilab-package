@@ -1,18 +1,41 @@
-g=squirrellab.stimuli.GaussianNoiseGeneratorV2();
-g.preTime = 100;
-g.stimTime = 500;
-g.tailTime = 100;
-g.stDev = 2;
-g.freqCutoff = 500;
-g.numFilters = 4;
-g.mean = -60;
-g.seed = 0;
-g.sampleRate = 1000;
-g.upperLimit = -55;
-g.lowerLimit = -65;
-g.units = 'mV';
-s=g.generate();
+obj.preTime = 10                 % Stimulus leading duration (ms)
+obj.tailTime = 10                % Stimulus trailing duration (ms)
+obj.barStimTime = 20				% Stimulus duration per bar (ms)
+obj.barInterval = 30				% Duration between bars (ms)
+obj.barIntensity = 1.0              % Bar light intensity (0-1)
+obj.backgroundIntensity = 0.0       % Background light intensity (0-1)
 
-f1=getfigH(1);
-lH=lineH([],s.getData,f1);
-lH.linemarkers;'
+obj.barWidth = 50                   % bar width (pix)
+obj.barHeight = 350                 % bar height (pix)
+obj.barSpan = 100					% limits (pix) of gridded space where bars will be flashed
+obj.barNOrientation = uint16(2)     % Bar number of orientation
+obj.barStartOrientation = 0         % Bar starting orientation (degrees)
+
+obj.barHorizontalPosition = 0       % Bar center relative to view center (px)
+obj.barVerticalPosition = 0         % Bar center relative to view center (px)
+
+obj.numberOfAverages = uint16(1)    % Number of epochs
+obj.interpulseInterval = 0          % Duration between trials (s)
+
+obj.barNOrientation = double(obj.barNOrientation);
+obj.barN = ceil(obj.barSpan / obj.barWidth);
+obj.stimTime_oneBar = (obj.barStimTime + obj.barInterval);
+obj.stimTime = obj.stimTime_oneBar * obj.barN * obj.barNOrientation;
+
+
+obj.barPositions = ([1:1:obj.barN]*obj.barWidth) - floor(obj.barSpan/2);
+obj.barOrientations = ([0:180/obj.barNOrientation:179])+obj.barStartOrientation;
+obj.barOrientations = mod(obj.barOrientations,180);
+obj.barOrientationsRad = obj.barOrientations/180*pi;
+
+
+
+canvasSize = [1120,920];
+time = [0:1:obj.preTime+obj.tailTime+obj.stimTime].*1e-3;
+
+bar = stage.builtin.stimuli.Rectangle();
+bar.color = obj.barIntensity;
+bar.size = [obj.barWidth, obj.barHeight];
+bar.orientation = obj.barOrientations(1);
+bar.position = canvasSize/2.0 + [obj.barHorizontalPosition obj.barVerticalPosition];
+
