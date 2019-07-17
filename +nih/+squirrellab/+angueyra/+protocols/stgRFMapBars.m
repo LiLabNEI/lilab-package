@@ -45,6 +45,7 @@ classdef stgRFMapBars < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
         end
         
         function setStimTime(obj)
+            obj.barNOrientation = double(obj.barNOrientation);
 			obj.barN = ceil(obj.barSpan / obj.barWidth);
 			obj.stimTime_oneBar = (obj.barStimTime + obj.barInterval);
             obj.stimTime = obj.stimTime_oneBar * obj.barN * obj.barNOrientation;
@@ -103,7 +104,7 @@ classdef stgRFMapBars < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
             obj.barOrientations = mod(obj.barOrientations,180);
             obj.barOrientationsRad = obj.barOrientations/180*pi;
             
-            fprintf('bar orientations = %3g\n',obj.barOrientations);
+%             fprintf('bar orientations = %3g\n',obj.barOrientations);
             
             p = stage.core.Presentation((obj.preTime + obj.stimTime + obj.tailTime) * 1e-3);
             p.setBackgroundColor(obj.backgroundIntensity);
@@ -119,18 +120,36 @@ classdef stgRFMapBars < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
 			% (order of operations here? does orientation controller operate after position controller? -> yes? go to moving bars stim)
             function h = positionTable(obj, time)
                 barNumber = 1;
+                barOrientation = obj.barOrientations(barNumber);
                 if time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3
                     barNumber = ceil( (time - (obj.preTime*1e-3)) / (obj.stimTime_oneBar * 1e-3) );
                     barNumber = mod(barNumber-1, obj.barNOrientation)+1;
+                    barOrientation = obj.barOrientations( ceil(barNumber/obj.barNOrientation) );
                 end
-                h = obj.barPositions(barNumber);
+                h = [cos(barOrientation) sin(barOrientation)] .* [obj.barPositions(barNumber),0] + canvasSize/2 + [obj.barHorizontalPosition obj.barVerticalPosition];
             end
             
             barPositionController = stage.builtin.controllers.PropertyController(bar, 'position', ...
                 @(state)positionTable(obj, state.time));
             p.addController(barPositionController);
 			
+
+            % Bar visibility controller
+            function v = toggleVis(obj, time)
+                v = 0;
+                if time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3
+                    barIntrinsicTime = mod(time - (obj.preTime*1e-3),(obj.stimTime_oneBar/1e3));
+                    if barIntrinsicTime <= obj.barStimTime * 1e-3
+                        v = 1;
+                    end
+                else
+                    v = 0;
+                end
+            end
+            barVisible = stage.builtin.controllers.PropertyController(bar, 'visible', @(state)toggleVis(obj,state.time));
+            p.addController(barVisible);
 			
+            
             % Bar orientation controller
             function o = orientationTable(obj, time)
                 barNumber = 1;
@@ -143,23 +162,10 @@ classdef stgRFMapBars < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
             barOrientationController = stage.builtin.controllers.PropertyController(bar, 'orientation', ...
                 @(state)orientationTable(obj, state.time));
             p.addController(barOrientationController);
-           
-
-            % Bar visibility controller
-            function v = toggleVis(obj, time)
-                v = 0;
-                if time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3
-                    barIntrinsicTime = mod(time - (obj.preTime*1e-3),(obj.stimTime_oneBar/1e3));
-                    if barIntrinsicTime < obj.barStimTime * 1e-3
-                        v = 1;
-                    end
-                end
-            end
-            barVisible = stage.builtin.controllers.PropertyController(bar, 'visible', @(state)toggleVis(state));
-            p.addController(barVisible);
-			
+            
+            
             p = obj.addFrameTracker(p);
-            % p = obj.addTrackerBarToFirstFrame(p);
+            p = obj.addTrackerBarToFirstFrame(p);
             
         end
         
