@@ -135,11 +135,13 @@ classdef stgRFMapBars < nih.squirrellab.shared.protocols.UvLCRStageProtocol_NoAm
             % Bar position controller (only operates on center, so need to consider orientation too)
             function p = togglePosition(obj, time)
                 time = time + 1/60e3; %shifting by one frame to avoid switch during presentation of bar
-                p = [0,0];
+                p = canvasSize/2 + [obj.barHorizontalPosition obj.barVerticalPosition];
                 if time > obj.preTime * 1e-3 && time < (obj.preTime + obj.stimTime) * 1e-3
                     barNumber = ceil( (time - (obj.preTime*1e-3)) / (obj.stimTime_oneBar * 1e-3) );
                     barNumber = mod(barNumber-1, obj.barN)+1;
-                    barOrientationRad = obj.barOrientationsRad( ceil(barNumber/obj.barNOrientation) );
+                    
+                    oNumber = ceil( (time - (obj.preTime*1e-3)) / (obj.stimTime_oneBar * 1e-3 * obj.barN) );
+                    barOrientationRad = obj.barOrientationsRad( oNumber );
                     p = [cos(barOrientationRad),sin(barOrientationRad)] .* [obj.barPositions(barNumber),obj.barPositions(barNumber)] + canvasSize/2 + [obj.barHorizontalPosition obj.barVerticalPosition];
                 end
                 
