@@ -8,7 +8,7 @@ obj.backgroundIntensity = 0.0       % Background light intensity (0-1)
 obj.barWidth = 50                   % bar width (pix)
 obj.barHeight = 350                 % bar height (pix)
 obj.barSpan = 100					% limits (pix) of gridded space where bars will be flashed
-obj.barNOrientation = uint16(2)     % Bar number of orientation
+obj.barNOrientation = uint16(4)     % Bar number of orientation
 obj.barStartOrientation = 0         % Bar starting orientation (degrees)
 
 obj.barHorizontalPosition = 0       % Bar center relative to view center (px)
